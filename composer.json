@@ -17,6 +17,7 @@
   "require": {
     "php": "^7.0.0",
     "team-reflex/discord-php": "dev-develop",
-    "monolog/monolog": "1.9.*"
+    "monolog/monolog": "1.9.*",
+    "pimple/pimple": "3.0.*"
   }
 }

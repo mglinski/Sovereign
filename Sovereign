@@ -1,0 +1,29 @@
+#!/usr/bin/env php7.0
+<?php
+
+// Use all the memory
+ini_set("memory_limit", "-1");
+define("DISCORDPHP_STARTTIME", microtime(true));
+define("BASEDIR", __DIR__);
+
+// Load the autoloader
+require_once(__DIR__ . "/vendor/autoload.php");
+
+// Load the config
+require_once(__DIR__ . "/config/config.php");
+
+// Load the dependencies
+$container = require_once(__DIR__ . "/config/dependencies.php");
+
+// Init the bot
+$container["log"]->addInfo("Sovereign is starting up..");
+
+try {
+    $bot = new \Sovereign\Sovereign($container);
+} catch (\Exception $e) {
+    $container["log"]->addError("An error occured: " . $e->getMessage());
+    die();
+}
+
+// Launch the bot
+$bot->run();
