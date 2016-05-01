@@ -1,0 +1,22 @@
+{
+  "name": "karbowiak/sovereign",
+  "description": "Discord Bot for EVE",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Michael Karbowiak",
+      "email": "karbowiak@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Sovereign\\": "src/"
+    }
+  },
+  "require": {
+    "php": "^7.0.0",
+    "team-reflex/discord-php": "dev-develop",
+    "monolog/monolog": "1.9.*"
+  }
+}
