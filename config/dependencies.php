@@ -22,5 +22,27 @@ $container["curl"] = function($container) {
     return new \Sovereign\Lib\cURL($container["log"]);
 };
 
+$container["settings"] = function($container) {
+    return new \Sovereign\Lib\Settings($container["db"]);
+};
+
+$container["permissions"] = function($container) {
+    return new \Sovereign\Lib\Permissions($container["db"]);
+};
+
+$container["users"] = function($container) {
+    return new \Sovereign\Lib\Users($container["db"]);
+};
+
+$container["wolframAlpha"] = function($container) {
+    $appID = $container["config"]->get("appID", "wolframalpha");
+    return new WolframAlpha\Engine($appID);
+};
+
+$startTime = time();
+$container["startTime"] = function($container) use ($startTime) {
+    return $startTime;
+};
+
 // Keep at the bottom to return the container
 return $container;

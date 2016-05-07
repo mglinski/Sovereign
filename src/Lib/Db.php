@@ -12,10 +12,13 @@ class Db
     public function __construct(Config $config, Logger $log) {
         $this->log = $log;
         $this->config = $config;
+        $this->pdo = $this->connect();
+    }
 
-        $dsn = "mysql:dbname={$config->get("dbName", "db")};host={$config->get("dbHost", "db")}";
+    private function connect() {
+        $dsn = "mysql:dbname={$this->config->get("dbName", "db")};host={$this->config->get("dbHost", "db")}";
         try {
-            $this->pdo = new \PDO($dsn, $this->config->get("dbUser", "db"), $this->config->get("dbPass", "db"), array(
+            $pdo = new \PDO($dsn, $this->config->get("dbUser", "db"), $this->config->get("dbPass", "db"), array(
                 \PDO::ATTR_PERSISTENT => true,
                 \PDO::ATTR_EMULATE_PREPARES => true,
                 \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
@@ -23,12 +26,14 @@ class Db
                 \PDO::MYSQL_ATTR_INIT_COMMAND => "SET time_zone = '+00:00',NAMES utf8;"
             ));
         } catch (\Exception $e) {
-            $log->addCritical("Unable to connect to database", [$e->getMessage()]);
+            $this->log->addCritical("Unable to connect to database", [$e->getMessage()]);
             die();
         }
+
+        return $pdo;
     }
 
-    public function query(String $query, $parameters = array()): array {
+    public function query(String $query, $parameters = array()) {
         try {
             $stmt = $this->pdo->prepare($query);
             $stmt->execute($parameters);
@@ -43,10 +48,17 @@ class Db
             return $result;
         } catch (\Exception $e) {
             $this->log->addError("There was an error during a query", [$e->getMessage()]);
+            try {
+                $this->pdo = $this->connect();
+            } catch (\Exception $e2) {
+                $this->log->addCritical("Couldn't reconnect to the database: " . $e->getMessage());
+                die(1);
+            }
         }
+        return array();
     }
 
-    public function queryRow(String $query, $parameters = array()): array {
+    public function queryRow(String $query, $parameters = array()) {
         $result = $this->query($query, $parameters);
 
         if(count($result) >= 1)
@@ -55,7 +67,7 @@ class Db
         return array();
     }
 
-    public function queryField(String $query, String $field, $parameters = array()): string {
+    public function queryField(String $query, String $field, $parameters = array()) {
         $result = $this->query($query, $parameters);
 
         if(count($result) == 0)
@@ -65,7 +77,7 @@ class Db
         return $resultRow[$field];
     }
 
-    public function execute(String $query, $parameters = array()): int {
+    public function execute(String $query, $parameters = array()) {
         try {
             $this->pdo->beginTransaction();
 
@@ -84,6 +96,13 @@ class Db
             return $returnID;
         } catch (\Exception $e) {
             $this->log->addError("There was an error during a query", [$e->getMessage()]);
+            try {
+                $this->pdo = $this->connect();
+            } catch (\Exception $e2) {
+                $this->log->addCritical("Couldn't reconnect to the database: " . $e->getMessage());
+                die(1);
+            }
         }
+        return null;
     }
 }

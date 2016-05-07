@@ -3,6 +3,8 @@
 
 // Use all the memory
 ini_set("memory_limit", "-1");
+gc_enable();
+error_reporting(0);
 define("DISCORDPHP_STARTTIME", microtime(true));
 define("BASEDIR", __DIR__);
 

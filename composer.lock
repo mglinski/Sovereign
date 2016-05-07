@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d35615ccf8f3fd26e53fa6251b030236",
-    "content-hash": "3819fabd0ef99705c3435e5c901b1940",
+    "hash": "b59a2dde3d8de0e5f1737ae9b235468c",
+    "content-hash": "65d8c31a5163f0d0b325bcbedcf7ac86",
     "packages": [
         {
             "name": "TrafficCophp/ByteBuffer",
@@ -646,6 +646,45 @@
             "time": "2012-11-02 14:49:47"
         },
         {
+            "name": "francescomalatesta/wolframalphaphp",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/francescomalatesta/wolframalphaphp.git",
+                "reference": "2d136b7322387366007c1f9eb69de981c07ac4d2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/francescomalatesta/wolframalphaphp/zipball/2d136b7322387366007c1f9eb69de981c07ac4d2",
+                "reference": "2d136b7322387366007c1f9eb69de981c07ac4d2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "WolframAlpha\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Francesco Malatesta",
+                    "email": "francescomalatesta@live.it",
+                    "homepage": "http://www.hellofrancesco.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A PHP Wrapper for Wolfram|Alpha APIs (v2).",
+            "homepage": "https://github.com/francescomalatesta/wolframalphaphp",
+            "time": "2014-12-13 17:08:36"
+        },
+        {
             "name": "guzzlehttp/guzzle",
             "version": "6.2.0",
             "source": {
@@ -1122,6 +1161,56 @@
                 "dependency injection"
             ],
             "time": "2015-09-11 15:10:35"
+        },
+        {
+            "name": "predis/predis",
+            "version": "v1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nrk/predis.git",
+                "reference": "84060b9034d756b4d79641667d7f9efe1aeb8e04"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nrk/predis/zipball/84060b9034d756b4d79641667d7f9efe1aeb8e04",
+                "reference": "84060b9034d756b4d79641667d7f9efe1aeb8e04",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "suggest": {
+                "ext-curl": "Allows access to Webdis when paired with phpiredis",
+                "ext-phpiredis": "Allows faster serialization and deserialization of the Redis protocol"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Predis\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Daniele Alessandri",
+                    "email": "suppakilla@gmail.com",
+                    "homepage": "http://clorophilla.net"
+                }
+            ],
+            "description": "Flexible and feature-complete PHP client library for Redis",
+            "homepage": "http://github.com/nrk/predis",
+            "keywords": [
+                "nosql",
+                "predis",
+                "redis"
+            ],
+            "time": "2015-07-30 18:34:15"
         },
         {
             "name": "psr/cache",
@@ -3073,7 +3162,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "team-reflex/discord-php": 20
+        "team-reflex/discord-php": 20,
+        "francescomalatesta/wolframalphaphp": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
