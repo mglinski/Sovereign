@@ -109,6 +109,9 @@ Memory Usage: ~" . round(memory_get_usage() / 1024 / 1024, 3) . "MB
 Uptime: " . $interval->y . " Year(s), " . $interval->m . " Month(s), " . $interval->d . " Days, " . $interval->h . " Hours, " . $interval->i . " Minutes, " . $interval->s . " seconds.
 ```";
         $this->message->reply($msg);
+
+        // Mark this as garbage
+        $this->isGarbage();
     }
 
     public function information()

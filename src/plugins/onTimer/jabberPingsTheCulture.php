@@ -40,13 +40,4 @@ class jabberPingsTheCulture {
         $data = null;
         $handle = null;
     }
-
-    public function information() {
-        return (object) array(
-            "description" => "",
-            "usage" => "",
-            "permission" => 1,
-            "timer" => 1
-        );
-    }
 }

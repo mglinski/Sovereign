@@ -112,9 +112,6 @@ class Sovereign
         $this->startTime = time();
         $this->pool = new \Pool(15);
 
-        // Load the plugins (It populates $onMessage, $onStart, $onTimer)
-        $this->loadPlugins();
-
         // Fire up the onStart plugins
 
         // Init Discord and Websocket
@@ -128,35 +125,7 @@ class Sovereign
         $this->websocket = new WebSocket($this->discord);
     }
 
-    private function loadPlugins()
-    {
-        $this->addPlugin("onMessage", "about", "\\Sovereign\\Plugins\\about", 1, "", "", null);
-        $this->addPlugin("onMessage", "auth", "\\Sovereign\\Plugins\\auth", 1, "Authenticates a user against an EVE Online login page", "", null);
-        $this->addPlugin("onMessage", "char", "\\Sovereign\\Plugins\\char", 1, "", "", null);
-        $this->addPlugin("onMessage", "coinflip", "\\Sovereign\\Plugins\\coinflip", 1, "", "", null);
-        $this->addPlugin("onMessage", "config", "\\Sovereign\\Plugins\\config", 1, "", "", null);
-        $this->addPlugin("onMessage", "corp", "\\Sovereign\\Plugins\\corp", 1, "", "", null);
-        $this->addPlugin("onMessage", "eightball", "\\Sovereign\\Plugins\\eightball", 1, "", "", null);
-        $this->addPlugin("onMessage", "eb", "\\Sovereign\\Plugins\\eightball", 1, "", "", null);
-        $this->addPlugin("onMessage", "guilds", "\\Sovereign\\Plugins\\guilds", 1, "", "", null);
-        $this->addPlugin("onMessage", "item", "\\Sovereign\\Plugins\\item", 1, "", "", null);
-        $this->addPlugin("onMessage", "join", "\\Sovereign\\Plugins\\join", 1, "", "", null);
-        $this->addPlugin("onMessage", "meme", "\\Sovereign\\Plugins\\meme", 1, "", "", null);
-        $this->addPlugin("onMessage", "pc", "\\Sovereign\\Plugins\\pc", 1, "", "", null);
-        $this->addPlugin("onMessage", "amarr", "\\Sovereign\\Plugins\\pc", 1, "", "", null);
-        $this->addPlugin("onMessage", "jita", "\\Sovereign\\Plugins\\pc", 1, "", "", null);
-        $this->addPlugin("onMessage", "dodixie", "\\Sovereign\\Plugins\\pc", 1, "", "", null);
-        $this->addPlugin("onMessage", "hek", "\\Sovereign\\Plugins\\pc", 1, "", "", null);
-        $this->addPlugin("onMessage", "rens", "\\Sovereign\\Plugins\\pc", 1, "", "", null);
-        $this->addPlugin("onMessage", "porn", "\\Sovereign\\Plugins\\porn", 1, "", "", null);
-        $this->addPlugin("onMessage", "time", "\\Sovereign\\Plugins\\time", 1, "", "", null);
-        $this->addPlugin("onMessage", "tq", "\\Sovereign\\Plugins\\tq", 1, "", "", null);
-        $this->addPlugin("onMessage", "user", "\\Sovereign\\Plugins\\user", 1, "", "", null);
-        $this->addPlugin("onMessage", "wolf", "\\Sovereign\\Plugins\\wolf", 1, "", "", null);
-        $this->addPlugin("onMessage", "help", "\\Sovereign\\Plugins\\help", 1, "Shows helpfull information about all the plugins available", null, null);
-    }
-
-    private function addPlugin($type, $command, $class, $perms, $description, $usage, $timer)
+    public function addPlugin($type, $command, $class, $perms, $description, $usage, $timer)
     {
         $this->$type[$command] = [
             "permissions" => $perms,

@@ -13,13 +13,4 @@ class memory {
         gc_collect_cycles();
         $container["log"]->addInfo("Memory in use after garbage collection: " . memory_get_usage() / 1024 / 1024 . "MB");
     }
-
-    public function information() {
-        return (object) array(
-            "description" => "",
-            "usage" => "",
-            "permission" => 1,
-            "timer" => 1800
-        );
-    }
 }
