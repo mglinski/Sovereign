@@ -89,13 +89,4 @@ class guilds extends \Threaded implements \Collectable
 
         $this->message->reply("I am on the following servers: " . rtrim($list, ", "));
     }
-
-    public function information()
-    {
-        return (object)array(
-            "description" => "Tells you what guilds (Server) the bot is on",
-            "usage" => "",
-            "permission" => 1//1 is everyone, 2 is only admin
-        );
-    }
 }

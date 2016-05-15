@@ -136,13 +136,4 @@ For more info, visit: $url";
 
         $this->message->reply($msg);
     }
-
-    public function information()
-    {
-        return (object)array(
-            "description" => "Fetches data from EVE-KILL about a corporation",
-            "usage" => "<corporationName>",
-            "permission" => 1//1 is everyone, 2 is only admin
-        );
-    }
 }

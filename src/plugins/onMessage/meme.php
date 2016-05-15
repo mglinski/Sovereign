@@ -117,13 +117,4 @@ class meme extends \Threaded implements \Collectable
         );
         $this->message->reply($memes[array_rand($memes)]);
     }
-
-    public function information()
-    {
-        return (object)array(
-            "description" => "Dank memes!",
-            "usage" => "",
-            "permission" => 1//1 is everyone, 2 is only admin
-        );
-    }
 }

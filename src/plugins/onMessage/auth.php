@@ -122,13 +122,4 @@ class auth extends \Threaded implements \Collectable
             $this->message->reply("**Error** You are trying to authenticate with an already used (or not existing) auth token..");
         }
     }
-
-    public function information()
-    {
-        return (object)array(
-            "description" => "Authenticates you against a login with certain restrictions",
-            "usage" => "<authcode>",
-            "permission" => 1//1 is everyone, 2 is only admin
-        );
-    }
 }

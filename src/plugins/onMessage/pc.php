@@ -153,14 +153,4 @@ Sell:
             $this->message->reply("**Error:** No itemName set..");
         }
     }
-
-    public function information()
-    {
-        return (object)array(
-            "description" => "Lets you check prices of items in EVE. Available systems: pc (global), Jita, Amarr, Dodixie, Rens and Hek",
-            "usage" => "<itemName>",
-            "permission" => 1,//1 is everyone, 2 is only admin
-            "commands" => json_decode('["Jita","Amarr","Dodixie","Rens","Hek"]')
-        );
-    }
 }

@@ -88,13 +88,4 @@ class tq extends \Threaded implements \Collectable
         $msg = "**TQ Status:** {$tqStatus} with {$tqOnline} users online.";
         $this->message->reply($msg);
     }
-
-    public function information()
-    {
-        return (object)array(
-            "description" => "Tells you the current status of Tranquility",
-            "usage" => "",
-            "permission" => 1//1 is everyone, 2 is only admin
-        );
-    }
 }

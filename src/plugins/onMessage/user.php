@@ -103,13 +103,4 @@ class user extends \Threaded implements \Collectable
         }
 
     }
-
-    public function information()
-    {
-        return (object)array(
-            "description" => "Tells you discord information on a user. Including when the bot last saw them, saw them speak, and what they were last playing",
-            "usage" => "<discordName>",
-            "permission" => 1//1 is everyone, 2 is only admin
-        );
-    }
 }

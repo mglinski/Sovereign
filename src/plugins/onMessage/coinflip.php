@@ -85,13 +85,4 @@ class coinflip extends \Threaded implements \Collectable
         $sides = ["Heads", "Tails"];
         $this->message->reply("The result of the coinflip is: " . $sides[array_rand($sides)]);
     }
-
-    public function information()
-    {
-        return (object)array(
-            "description" => "Flips a coin, and gives you the results",
-            "usage" => "",
-            "permission" => 1//1 is everyone, 2 is only admin
-        );
-    }
 }

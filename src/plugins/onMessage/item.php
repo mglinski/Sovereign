@@ -102,13 +102,4 @@ class item extends \Threaded implements \Collectable
         }
 
     }
-
-    public function information()
-    {
-        return (object)array(
-            "description" => "Shows you all the information available in the database, for an item",
-            "usage" => "<itemName>",
-            "permission" => 1//1 is everyone, 2 is only admin
-        );
-    }
 }

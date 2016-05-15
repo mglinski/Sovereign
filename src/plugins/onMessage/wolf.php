@@ -104,13 +104,4 @@ class wolf extends \Threaded implements \Collectable
         }
 
     }
-
-    public function information()
-    {
-        return (object)array(
-            "description" => "Asks wolframAlpha a question, and returns the result",
-            "usage" => "<question>",
-            "permission" => 1//1 is everyone, 2 is only admin
-        );
-    }
 }

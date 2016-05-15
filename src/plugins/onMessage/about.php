@@ -113,13 +113,4 @@ Uptime: " . $interval->y . " Year(s), " . $interval->m . " Month(s), " . $interv
         // Mark this as garbage
         $this->isGarbage();
     }
-
-    public function information()
-    {
-        return (object)array(
-            "description" => "Shows information about the bot and it's creator",
-            "usage" => "",
-            "permission" => 1//1 is everyone, 2 is only admin
-        );
-    }
 }

@@ -199,13 +199,4 @@ class config extends \Threaded implements \Collectable
 
         $this->message->reply($msg);
     }
-
-    public function information()
-    {
-        return (object)array(
-            "description" => "Lets you configure parts of the bot, but only if you're admin",
-            "usage" => "",
-            "permission" => 2//1 is everyone, 2 is only admin
-        );
-    }
 }

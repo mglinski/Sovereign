@@ -207,13 +207,4 @@ class porn extends \Threaded implements \Collectable
             $this->message->reply("Sorry, this plugin is not allowed in this channel, speak to your admin to get it allowed");
         }
     }
-
-    public function information()
-    {
-        return (object)array(
-            "description" => "Returns a picture/gif from one of many Imgur categories",
-            "usage" => "<category>",
-            "permission" => 1//1 is everyone, 2 is only admin
-        );
-    }
 }

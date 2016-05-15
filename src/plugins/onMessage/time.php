@@ -102,13 +102,4 @@ class time extends \Threaded implements \Collectable
         $msg = "**Current EVE Time:** {$utc} / **EVE Date:** {$date} / **PT:** {$pt} / **ET:** {$et} / **CET:** {$cet} / **MSK:** {$msk} / **AEST:** {$aest}";
         $this->message->reply($msg);
     }
-
-    public function information()
-    {
-        return (object)array(
-            "description" => "Tells you the current EVE Time and time in various other timezones",
-            "usage" => "",
-            "permission" => 1//1 is everyone, 2 is only admin
-        );
-    }
 }

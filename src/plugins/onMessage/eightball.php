@@ -110,13 +110,4 @@ class eightball extends \Threaded implements \Collectable
 
         $this->message->reply($choices[array_rand($choices)]);
     }
-
-    public function information()
-    {
-        return (object)array(
-            "description" => "Shakes the eightball, and gives you a reply",
-            "usage" => "",
-            "permission" => 1//1 is everyone, 2 is only admin
-        );
-    }
 }
