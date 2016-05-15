@@ -11,7 +11,7 @@ $container["log"] = function($container) {
 };
 
 $container["config"] = function($container) {
-    return new \Sovereign\Lib\Config($container);
+    return new \Sovereign\Lib\Config();
 };
 
 $container["db"] = function($container) {
@@ -27,7 +27,11 @@ $container["settings"] = function($container) {
 };
 
 $container["permissions"] = function($container) {
-    return new \Sovereign\Lib\Permissions($container["db"]);
+    return new \Sovereign\Lib\Permissions($container["db"], $container["config"]);
+};
+
+$container["serverConfig"] = function($container) {
+    return new \Sovereign\Lib\ServerConfig($container["db"]);
 };
 
 $container["users"] = function($container) {
@@ -37,11 +41,6 @@ $container["users"] = function($container) {
 $container["wolframAlpha"] = function($container) {
     $appID = $container["config"]->get("appID", "wolframalpha");
     return new WolframAlpha\Engine($appID);
-};
-
-$startTime = time();
-$container["startTime"] = function($container) use ($startTime) {
-    return $startTime;
 };
 
 // Keep at the bottom to return the container

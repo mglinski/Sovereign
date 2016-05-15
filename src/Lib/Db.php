@@ -9,6 +9,17 @@ class Db
     protected $log;
     private $pdo;
 
+    public function __sleep() {
+        return array();
+    }
+
+    public function __wakeup() {
+        $this->log = new \Monolog\Logger("Sovereign");
+        $this->log->pushHandler(new \Monolog\Handler\StreamHandler("php://stdout", \Monolog\Logger::INFO));
+        $this->config = new Config();
+        $this->pdo = $this->connect();
+    }
+
     public function __construct(Config $config, Logger $log) {
         $this->log = $log;
         $this->config = $config;
@@ -19,7 +30,7 @@ class Db
         $dsn = "mysql:dbname={$this->config->get("dbName", "db")};host={$this->config->get("dbHost", "db")}";
         try {
             $pdo = new \PDO($dsn, $this->config->get("dbUser", "db"), $this->config->get("dbPass", "db"), array(
-                \PDO::ATTR_PERSISTENT => true,
+                \PDO::ATTR_PERSISTENT => false,
                 \PDO::ATTR_EMULATE_PREPARES => true,
                 \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
                 \PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,

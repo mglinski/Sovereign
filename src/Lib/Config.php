@@ -1,13 +1,8 @@
 <?php
 namespace Sovereign\Lib;
 
-use Pimple\Container;
-
 class Config {
-    private $container;
-
-    public function __construct(Container $container) {
-        $this->container = $container;
+    public function __construct() {
     }
 
     public function get($key, $type = null, $default = null) {

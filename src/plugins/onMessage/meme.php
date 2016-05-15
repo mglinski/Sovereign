@@ -4,10 +4,84 @@ namespace Sovereign\Plugins;
 
 use Discord\Discord;
 use Discord\Parts\Channel\Message;
-use Sovereign\Sovereign;
+use Monolog\Logger;
+use Sovereign\Lib\Config;
+use Sovereign\Lib\cURL;
+use Sovereign\Lib\Db;
+use Sovereign\Lib\Permissions;
+use Sovereign\Lib\ServerConfig;
+use Sovereign\Lib\Settings;
+use Sovereign\Lib\Users;
 
-class meme {
-    public static function onMessage(Message $message, Discord $discord, $config, Sovereign $bot) {
+class meme extends \Threaded implements \Collectable
+{
+    /**
+     * @var Message
+     */
+    private $message;
+    /**
+     * @var Discord
+     */
+    private $discord;
+    /**
+     * @var Logger
+     */
+    private $log;
+    /**
+     * @var Config
+     */
+    private $config;
+    /**
+     * @var Db
+     */
+    private $db;
+    /**
+     * @var cURL
+     */
+    private $curl;
+    /**
+     * @var Settings
+     */
+    private $settings;
+    /**
+     * @var Permissions
+     */
+    private $permissions;
+    /**
+     * @var ServerConfig
+     */
+    private $serverConfig;
+    /**
+     * @var Users
+     */
+    private $users;
+    /**
+     * @var \WolframAlpha\Engine
+     */
+    private $wolframAlpha;
+    /**
+     * @var int
+     */
+    private $startTime;
+
+    public function __construct($message, $discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $wolframAlpha, $startTime)
+    {
+        $this->message = $message;
+        $this->discord = $discord;
+        $this->log = $log;
+        $this->config = $config;
+        $this->db = $db;
+        $this->curl = $curl;
+        $this->settings = $settings;
+        $this->permissions = $permissions;
+        $this->serverConfig = $serverConfig;
+        $this->users = $users;
+        $this->wolframAlpha = $wolframAlpha;
+        $this->startTime = $startTime;
+    }
+
+    public function run()
+    {
         $memes = array(
             'dank meme',
             '>mfw no gf',
@@ -41,19 +115,12 @@ class meme {
             '╰( ͡° ͜ʖ ͡° )つ──☆*:・ﾟ clickty clack clickty clack with this chant I summon spam to the chat',
             'work it ᕙ༼ຈل͜ຈ༽ᕗ harder make it (ง •̀_•́)ง better do it ᕦ༼ຈل͜ຈ༽ᕤ faster raise ur ヽ༼ຈل͜ຈ༽ﾉ donger',
         );
-        $message->reply($memes[array_rand($memes)]);
+        $this->message->reply($memes[array_rand($memes)]);
     }
 
-    public function onStart() {
-
-    }
-
-    public function onTimer() {
-
-    }
-
-    public function information() {
-        return (object) array(
+    public function information()
+    {
+        return (object)array(
             "description" => "Dank memes!",
             "usage" => "",
             "permission" => 1//1 is everyone, 2 is only admin

@@ -4,14 +4,88 @@ namespace Sovereign\Plugins;
 
 use Discord\Discord;
 use Discord\Parts\Channel\Message;
-use Sovereign\Sovereign;
+use Monolog\Logger;
 use SimpleXMLElement;
+use Sovereign\Lib\Config;
+use Sovereign\Lib\cURL;
+use Sovereign\Lib\Db;
+use Sovereign\Lib\Permissions;
+use Sovereign\Lib\ServerConfig;
+use Sovereign\Lib\Settings;
+use Sovereign\Lib\Users;
 
-class pc {
-    public static function onMessage(Message $message, Discord $discord, $config, Sovereign $bot) {
-        $container = $bot->getContainer();
-        $explode = explode(" ", $message->content);
-        $system = isset($explode[0]) ? $explode[0] == "%pc" ? "global" : str_replace("%", "", $explode[0]) : "global";
+class pc extends \Threaded implements \Collectable
+{
+    /**
+     * @var Message
+     */
+    private $message;
+    /**
+     * @var Discord
+     */
+    private $discord;
+    /**
+     * @var Logger
+     */
+    private $log;
+    /**
+     * @var Config
+     */
+    private $config;
+    /**
+     * @var Db
+     */
+    private $db;
+    /**
+     * @var cURL
+     */
+    private $curl;
+    /**
+     * @var Settings
+     */
+    private $settings;
+    /**
+     * @var Permissions
+     */
+    private $permissions;
+    /**
+     * @var ServerConfig
+     */
+    private $serverConfig;
+    /**
+     * @var Users
+     */
+    private $users;
+    /**
+     * @var \WolframAlpha\Engine
+     */
+    private $wolframAlpha;
+    /**
+     * @var int
+     */
+    private $startTime;
+
+    public function __construct($message, $discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $wolframAlpha, $startTime)
+    {
+        $this->message = $message;
+        $this->discord = $discord;
+        $this->log = $log;
+        $this->config = $config;
+        $this->db = $db;
+        $this->curl = $curl;
+        $this->settings = $settings;
+        $this->permissions = $permissions;
+        $this->serverConfig = $serverConfig;
+        $this->users = $users;
+        $this->wolframAlpha = $wolframAlpha;
+        $this->startTime = $startTime;
+    }
+
+    public function run()
+    {
+        $explode = explode(" ", $this->message->content);
+        $prefix = $this->config->prefix;
+        $system = isset($explode[0]) ? $explode[0] == "{$prefix}pc" ? "global" : str_replace($prefix, "", $explode[0]) : "global";
         $item = isset($explode[1]) ? $explode[1] : "";
 
         // Stuff that doesn't need a db lookup
@@ -21,24 +95,24 @@ class pc {
             "extractor" => array("typeName" => "Skill Extractor", "typeID" => 40519)
         ];
 
-        if($system && $item) {
-            if(isset($quickLookUps[$item])) {
+        if ($system && $item) {
+            if (isset($quickLookUps[$item])) {
                 $single = $quickLookUps[$item];
                 $multiple = null;
             } else {
-                $single = $container["db"]->queryRow("SELECT typeID, typeName FROM invTypes WHERE typeName = :item", array(":item" => $item));
-                $multiple = $container["db"]->query("SELECT typeID, typeName FROM invTypes WHERE typeName LIKE :item LIMIT 5", array(":item" => $item));
+                $single = $this->db->queryRow("SELECT typeID, typeName FROM invTypes WHERE typeName = :item", array(":item" => $item));
+                $multiple = $this->db->query("SELECT typeID, typeName FROM invTypes WHERE typeName LIKE :item LIMIT 5", array(":item" => $item));
             }
 
-            if(count($multiple) == 1)
+            if (count($multiple) == 1)
                 $single = $multiple[0];
 
-            if(empty($single) && !empty($multiple)) {
+            if (empty($single) && !empty($multiple)) {
                 $items = array();
                 foreach ($multiple as $item)
                     $items[] = $item["typeName"];
                 $items = implode(", ", $items);
-                return $message->reply("**Multiple results found:** {$items}");
+                return $this->message->reply("**Multiple results found:** {$items}");
             }
 
             // If there is a single result, we'll get data now!
@@ -46,13 +120,12 @@ class pc {
                 $typeID = $single["typeID"];
                 $typeName = $single["typeName"];
 
-                if($system == "global") {
+                if ($system == "global") {
                     $system = "global";
-                    $data = new SimpleXMLElement($container["curl"]->get("https://api.eve-central.com/api/marketstat?typeid={$typeID}"));
-                }
-                else {
-                    $solarSystemID = $container["db"]->queryField("SELECT solarSystemID FROM mapSolarSystems WHERE solarSystemName = :system", "solarSystemID", array(":system" => $system));
-                    $data = new SimpleXMLElement($container["curl"]->get("https://api.eve-central.com/api/marketstat?usesystem={$solarSystemID}&typeid={$typeID}"));
+                    $data = new SimpleXMLElement($this->curl->get("https://api.eve-central.com/api/marketstat?typeid={$typeID}"));
+                } else {
+                    $solarSystemID = $this->db->queryField("SELECT solarSystemID FROM mapSolarSystems WHERE solarSystemName = :system", "solarSystemID", array(":system" => $system));
+                    $data = new SimpleXMLElement($this->curl->get("https://api.eve-central.com/api/marketstat?usesystem={$solarSystemID}&typeid={$typeID}"));
                 }
                 $lowBuy = number_format((float)$data->marketstat->type->buy->min, 2);
                 $avgBuy = number_format((float)$data->marketstat->type->buy->avg, 2);
@@ -72,25 +145,18 @@ Sell:
   Low: {$lowSell}
   Avg: {$avgSell}
   High: {$highSell}```";
-                $message->reply($messageData);
+                $this->message->reply($messageData);
             } else {
-                $message->reply("**Error:** ***{$item}*** not found");
+                $this->message->reply("**Error:** ***{$item}*** not found");
             }
         } else {
-            $message->reply("**Error:** No itemName set..");
+            $this->message->reply("**Error:** No itemName set..");
         }
     }
 
-    public function onStart() {
-
-    }
-
-    public function onTimer() {
-
-    }
-
-    public function information() {
-        return (object) array(
+    public function information()
+    {
+        return (object)array(
             "description" => "Lets you check prices of items in EVE. Available systems: pc (global), Jita, Amarr, Dodixie, Rens and Hek",
             "usage" => "<itemName>",
             "permission" => 1,//1 is everyone, 2 is only admin

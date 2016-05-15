@@ -4,7 +4,7 @@
 // Use all the memory
 ini_set("memory_limit", "-1");
 gc_enable();
-error_reporting(0);
+error_reporting(1);
 define("DISCORDPHP_STARTTIME", microtime(true));
 define("BASEDIR", __DIR__);
 
@@ -21,6 +21,7 @@ $container = require_once(__DIR__ . "/config/dependencies.php");
 $container["log"]->addInfo("Sovereign is starting up..");
 
 try {
+    $startTime = time();
     $bot = new \Sovereign\Sovereign($container);
 } catch (\Exception $e) {
     $container["log"]->addError("An error occured: " . $e->getMessage());

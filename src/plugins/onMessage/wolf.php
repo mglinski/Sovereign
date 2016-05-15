@@ -4,44 +4,110 @@ namespace Sovereign\Plugins;
 
 use Discord\Discord;
 use Discord\Parts\Channel\Message;
-use Sovereign\Sovereign;
+use Monolog\Logger;
+use Sovereign\Lib\Config;
+use Sovereign\Lib\cURL;
+use Sovereign\Lib\Db;
+use Sovereign\Lib\Permissions;
+use Sovereign\Lib\ServerConfig;
+use Sovereign\Lib\Settings;
+use Sovereign\Lib\Users;
 
-class wolf {
-    public static function onMessage(Message $message, Discord $discord, $config, Sovereign $bot) {
-        $container = $bot->getContainer();
-        $explode = explode(" ", $message->content);
+class wolf extends \Threaded implements \Collectable
+{
+    /**
+     * @var Message
+     */
+    private $message;
+    /**
+     * @var Discord
+     */
+    private $discord;
+    /**
+     * @var Logger
+     */
+    private $log;
+    /**
+     * @var Config
+     */
+    private $config;
+    /**
+     * @var Db
+     */
+    private $db;
+    /**
+     * @var cURL
+     */
+    private $curl;
+    /**
+     * @var Settings
+     */
+    private $settings;
+    /**
+     * @var Permissions
+     */
+    private $permissions;
+    /**
+     * @var ServerConfig
+     */
+    private $serverConfig;
+    /**
+     * @var Users
+     */
+    private $users;
+    /**
+     * @var \WolframAlpha\Engine
+     */
+    private $wolframAlpha;
+    /**
+     * @var int
+     */
+    private $startTime;
+
+    public function __construct($message, $discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $wolframAlpha, $startTime)
+    {
+        $this->message = $message;
+        $this->discord = $discord;
+        $this->log = $log;
+        $this->config = $config;
+        $this->db = $db;
+        $this->curl = $curl;
+        $this->settings = $settings;
+        $this->permissions = $permissions;
+        $this->serverConfig = $serverConfig;
+        $this->users = $users;
+        $this->wolframAlpha = $wolframAlpha;
+        $this->startTime = $startTime;
+    }
+
+    public function run()
+    {
+        $explode = explode(" ", $this->message->content);
         unset($explode[0]);
         $query = implode(" ", $explode);
 
         /** @var \WolframAlpha\QueryResult $result */
-        $result = $container["wolframAlpha"]->process($query, array(), array("image", "plaintext"));
+        $result = $this->wolframAlpha->process($query, array(), array("image", "plaintext"));
         /** @var \WolframAlpha\Pod $pod */
         $pod = $result->pods["Result"];
 
-        if(!empty($pod)) {
+        if (!empty($pod)) {
             /** @var \WolframAlpha\Subpod $subPod */
             $subPod = $pod->subpods[0];
 
-            if(strlen($subPod->img->src) > 0)
-                $message->reply("Result: {$subPod->plaintext}\r\n {$subPod->img->src}");
+            if (strlen($subPod->img->src) > 0)
+                $this->message->reply("Result: {$subPod->plaintext}\r\n {$subPod->img->src}");
             else
-                $message->reply("Result: {$subPod->plaintext}");
+                $this->message->reply("Result: {$subPod->plaintext}");
         } else {
-            $message->reply("WolframAlpha did not have an answer to your query..");
+            $this->message->reply("WolframAlpha did not have an answer to your query..");
         }
 
     }
 
-    public function onStart() {
-
-    }
-
-    public function onTimer() {
-
-    }
-
-    public function information() {
-        return (object) array(
+    public function information()
+    {
+        return (object)array(
             "description" => "Asks wolframAlpha a question, and returns the result",
             "usage" => "<question>",
             "permission" => 1//1 is everyone, 2 is only admin
