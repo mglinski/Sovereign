@@ -28,6 +28,10 @@ class char extends \Threaded implements \Collectable
      */
     private $log;
     /**
+     * @var array
+     */
+    private $channelConfig;
+    /**
      * @var Config
      */
     private $config;
@@ -56,18 +60,15 @@ class char extends \Threaded implements \Collectable
      */
     private $users;
     /**
-     * @var \WolframAlpha\Engine
+     * @var array
      */
-    private $wolframAlpha;
-    /**
-     * @var int
-     */
-    private $startTime;
+    private $extras;
 
-    public function __construct($message, $discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $wolframAlpha, $startTime)
+    public function __construct($message, $discord, $channelConfig, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $extras)
     {
         $this->message = $message;
         $this->discord = $discord;
+        $this->channelConfig = $channelConfig;
         $this->log = $log;
         $this->config = $config;
         $this->db = $db;
@@ -76,30 +77,37 @@ class char extends \Threaded implements \Collectable
         $this->permissions = $permissions;
         $this->serverConfig = $serverConfig;
         $this->users = $users;
-        $this->wolframAlpha = $wolframAlpha;
-        $this->startTime = $startTime;
+        $this->extras = $extras;
     }
 
     public function run()
-    {        // Most EVE players on Discord use their ingame name, so lets support @highlights
+    {
+        // Most EVE players on Discord use their ingame name, so lets support @highlights
         $explode = explode(" ", $this->message->content);
-        $name = isset($explode[1]) ? $explode[1] : "";
+        unset($explode[0]);
+        $name = implode(" ", $explode);
         $name = stristr($name, "@") ? str_replace("<@", "", str_replace(">", "", $name)) : $name;
 
         if (is_numeric($name)) // The person used @highlighting, so now we got a discord id, lets map that to a name
             $name = $this->db->queryField("SELECT nickName FROM users WHERE discordID = :id", "nickName", array(":id" => $name));
 
-
-        $url = "http://rena.karbowiak.dk/api/search/character/{$name}/";
+        $url = "https://evedata.xyz/api/search/character/" . urlencode($name) . "/";
         $data = @json_decode($this->curl->get($url), true)["character"];
         if (empty($data))
             return $this->message->reply("**Error:** no results was returned.");
 
+        $exists = false;
         if (count($data) > 1) {
             $results = array();
-            foreach ($data as $char)
+            foreach ($data as $char) {
+                if(strtolower($char["characterName"]) == strtolower($name)) {
+                    $data[0]["characterID"] = $char["characterID"];
+                    $exists = true;
+                }
                 $results[] = $char["characterName"];
-            return $this->message->reply("**Error:** more than one result was returned: " . implode(", ", $results));
+            }
+            if($exists == false)
+                return $this->message->reply("**Error:** more than one result was returned: " . implode(", ", $results));
         }
 
         // Get stats
@@ -150,5 +158,8 @@ facepalms: {$facepalms}
 lastUpdated: $lastUpdated```
 For more info, visit: $url";
         $this->message->reply($msg);
+
+        // Mark this as garbage
+        $this->isGarbage();
     }
 }

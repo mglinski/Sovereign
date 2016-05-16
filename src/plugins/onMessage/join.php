@@ -28,6 +28,10 @@ class join extends \Threaded implements \Collectable
      */
     private $log;
     /**
+     * @var array
+     */
+    private $channelConfig;
+    /**
      * @var Config
      */
     private $config;
@@ -56,18 +60,15 @@ class join extends \Threaded implements \Collectable
      */
     private $users;
     /**
-     * @var \WolframAlpha\Engine
+     * @var array
      */
-    private $wolframAlpha;
-    /**
-     * @var int
-     */
-    private $startTime;
+    private $extras;
 
-    public function __construct($message, $discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $wolframAlpha, $startTime)
+    public function __construct($message, $discord, $channelConfig, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $extras)
     {
         $this->message = $message;
         $this->discord = $discord;
+        $this->channelConfig = $channelConfig;
         $this->log = $log;
         $this->config = $config;
         $this->db = $db;
@@ -76,12 +77,14 @@ class join extends \Threaded implements \Collectable
         $this->permissions = $permissions;
         $this->serverConfig = $serverConfig;
         $this->users = $users;
-        $this->wolframAlpha = $wolframAlpha;
-        $this->startTime = $startTime;
+        $this->extras = $extras;
     }
 
     public function run()
     {
         $this->message->reply("Sorry, joining a server does not work - instead use the following link: https://discordapp.com/oauth2/authorize?client_id=176115483513323520&scope=bot&permissions=36703232");
+        
+        // Mark this as garbage
+        $this->isGarbage();
     }
 }

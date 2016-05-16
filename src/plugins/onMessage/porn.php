@@ -28,6 +28,10 @@ class porn extends \Threaded implements \Collectable
      */
     private $log;
     /**
+     * @var array
+     */
+    private $channelConfig;
+    /**
      * @var Config
      */
     private $config;
@@ -56,18 +60,15 @@ class porn extends \Threaded implements \Collectable
      */
     private $users;
     /**
-     * @var \WolframAlpha\Engine
+     * @var array
      */
-    private $wolframAlpha;
-    /**
-     * @var int
-     */
-    private $startTime;
+    private $extras;
 
-    public function __construct($message, $discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $wolframAlpha, $startTime)
+    public function __construct($message, $discord, $channelConfig, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $extras)
     {
         $this->message = $message;
         $this->discord = $discord;
+        $this->channelConfig = $channelConfig;
         $this->log = $log;
         $this->config = $config;
         $this->db = $db;
@@ -76,16 +77,15 @@ class porn extends \Threaded implements \Collectable
         $this->permissions = $permissions;
         $this->serverConfig = $serverConfig;
         $this->users = $users;
-        $this->wolframAlpha = $wolframAlpha;
-        $this->startTime = $startTime;
+        $this->extras = $extras;
     }
 
     public function run()
     {
-        $config = @$this->config->porn;
+        $pornConfig = @$this->channelConfig->porn;
 
         // This is one of those plugins that need to be allowed before it works
-        if (isset($config->allowedChannels) && in_array($this->message->channel_id, $this->config->allowedChannels)) {
+        if (isset($pornConfig->allowedChannels) && in_array($this->message->channel_id, $pornConfig->allowedChannels)) {
             $explode = explode(" ", $this->message->content);
             $type = isset($explode[1]) ? $explode[1] : "";
             $urls = [];
@@ -204,7 +204,10 @@ class porn extends \Threaded implements \Collectable
             }
 
         } else {
-            $this->message->reply("Sorry, this plugin is not allowed in this channel, speak to your admin to get it allowed");
+            $this->message->reply("Sorry, this plugin is not allowed in this channel, speak to your admin to get it allowed (To enable, use {$this->channelConfig->prefix}config enablePorn)");
         }
+
+        // Mark this as garbage
+        $this->isGarbage();
     }
 }

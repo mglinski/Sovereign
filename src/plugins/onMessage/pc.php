@@ -29,6 +29,10 @@ class pc extends \Threaded implements \Collectable
      */
     private $log;
     /**
+     * @var array
+     */
+    private $channelConfig;
+    /**
      * @var Config
      */
     private $config;
@@ -57,18 +61,15 @@ class pc extends \Threaded implements \Collectable
      */
     private $users;
     /**
-     * @var \WolframAlpha\Engine
+     * @var array
      */
-    private $wolframAlpha;
-    /**
-     * @var int
-     */
-    private $startTime;
+    private $extras;
 
-    public function __construct($message, $discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $wolframAlpha, $startTime)
+    public function __construct($message, $discord, $channelConfig, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $extras)
     {
         $this->message = $message;
         $this->discord = $discord;
+        $this->channelConfig = $channelConfig;
         $this->log = $log;
         $this->config = $config;
         $this->db = $db;
@@ -77,14 +78,13 @@ class pc extends \Threaded implements \Collectable
         $this->permissions = $permissions;
         $this->serverConfig = $serverConfig;
         $this->users = $users;
-        $this->wolframAlpha = $wolframAlpha;
-        $this->startTime = $startTime;
+        $this->extras = $extras;
     }
 
     public function run()
     {
         $explode = explode(" ", $this->message->content);
-        $prefix = $this->config->prefix;
+        $prefix = $this->channelConfig->prefix;
         $system = isset($explode[0]) ? $explode[0] == "{$prefix}pc" ? "global" : str_replace($prefix, "", $explode[0]) : "global";
         $item = isset($explode[1]) ? $explode[1] : "";
 
@@ -152,5 +152,8 @@ Sell:
         } else {
             $this->message->reply("**Error:** No itemName set..");
         }
+
+        // Mark this as garbage
+        $this->isGarbage();
     }
 }

@@ -11,7 +11,7 @@ use Sovereign\Sovereign;
 class jabberPingsTheCulture {
 
     public static function onTimer(Discord $discord, $container, $config) {
-        // This really needs to be made pretty - and per. server configurable - somehow........
+        // @todo This really needs to be made pretty - and per. server configurable - somehow.... (Maybe using sockets?)
         $data = file("/tmp/discord.db");
         /** @var Logger $log */
         $log = $container["log"];

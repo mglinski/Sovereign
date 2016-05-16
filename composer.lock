@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "eae568c4f1940dc28963af830e9c1d3a",
-    "content-hash": "42da31804608b0790520791f36ea4397",
+    "hash": "c48ff286d36607d72f90569dcf1667ea",
+    "content-hash": "10fcb318b0aa364ef9977ce672aee6c9",
     "packages": [
         {
             "name": "TrafficCophp/ByteBuffer",
@@ -646,45 +646,6 @@
             "time": "2012-11-02 14:49:47"
         },
         {
-            "name": "francescomalatesta/wolframalphaphp",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/francescomalatesta/wolframalphaphp.git",
-                "reference": "2d136b7322387366007c1f9eb69de981c07ac4d2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/francescomalatesta/wolframalphaphp/zipball/2d136b7322387366007c1f9eb69de981c07ac4d2",
-                "reference": "2d136b7322387366007c1f9eb69de981c07ac4d2",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "WolframAlpha\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Francesco Malatesta",
-                    "email": "francescomalatesta@live.it",
-                    "homepage": "http://www.hellofrancesco.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A PHP Wrapper for Wolfram|Alpha APIs (v2).",
-            "homepage": "https://github.com/francescomalatesta/wolframalphaphp",
-            "time": "2014-12-13 17:08:36"
-        },
-        {
             "name": "guzzlehttp/guzzle",
             "version": "6.2.0",
             "source": {
@@ -954,64 +915,6 @@
             "time": "2016-04-21 13:28:36"
         },
         {
-            "name": "jeremeamia/SuperClosure",
-            "version": "2.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jeremeamia/super_closure.git",
-                "reference": "29a88be2a4846d27c1613aed0c9071dfad7b5938"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jeremeamia/super_closure/zipball/29a88be2a4846d27c1613aed0c9071dfad7b5938",
-                "reference": "29a88be2a4846d27c1613aed0c9071dfad7b5938",
-                "shasum": ""
-            },
-            "require": {
-                "nikic/php-parser": "^1.2|^2.0",
-                "php": ">=5.4",
-                "symfony/polyfill-php56": "^1.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.0|^5.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.2-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "SuperClosure\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jeremy Lindblom",
-                    "email": "jeremeamia@gmail.com",
-                    "homepage": "https://github.com/jeremeamia",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Serialize Closure objects, including their context and binding",
-            "homepage": "https://github.com/jeremeamia/super_closure",
-            "keywords": [
-                "closure",
-                "function",
-                "lambda",
-                "parser",
-                "serializable",
-                "serialize",
-                "tokenizer"
-            ],
-            "time": "2015-12-05 17:17:57"
-        },
-        {
             "name": "monolog/monolog",
             "version": "1.9.1",
             "source": {
@@ -1125,57 +1028,6 @@
                 "time"
             ],
             "time": "2015-11-04 20:07:17"
-        },
-        {
-            "name": "nikic/php-parser",
-            "version": "v2.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "47b254ea51f1d6d5dc04b9b299e88346bf2369e3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/47b254ea51f1d6d5dc04b9b299e88346bf2369e3",
-                "reference": "47b254ea51f1d6d5dc04b9b299e88346bf2369e3",
-                "shasum": ""
-            },
-            "require": {
-                "ext-tokenizer": "*",
-                "php": ">=5.4"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.0"
-            },
-            "bin": [
-                "bin/php-parse"
-            ],
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.1-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "PhpParser\\": "lib/PhpParser"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Nikita Popov"
-                }
-            ],
-            "description": "A PHP parser written in PHP",
-            "keywords": [
-                "parser",
-                "php"
-            ],
-            "time": "2016-04-19 13:41:41"
         },
         {
             "name": "paragonie/random_compat",
@@ -3272,8 +3124,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "team-reflex/discord-php": 20,
-        "francescomalatesta/wolframalphaphp": 20
+        "team-reflex/discord-php": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

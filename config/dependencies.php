@@ -38,10 +38,5 @@ $container["users"] = function($container) {
     return new \Sovereign\Lib\Users($container["db"]);
 };
 
-$container["wolframAlpha"] = function($container) {
-    $appID = $container["config"]->get("appID", "wolframalpha");
-    return new WolframAlpha\Engine($appID);
-};
-
 // Keep at the bottom to return the container
 return $container;

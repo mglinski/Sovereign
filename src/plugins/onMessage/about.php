@@ -30,6 +30,10 @@ class about extends \Threaded implements \Collectable
      */
     private $log;
     /**
+     * @var array
+     */
+    private $channelConfig;
+    /**
      * @var Config
      */
     private $config;
@@ -58,18 +62,15 @@ class about extends \Threaded implements \Collectable
      */
     private $users;
     /**
-     * @var \WolframAlpha\Engine
+     * @var array
      */
-    private $wolframAlpha;
-    /**
-     * @var int
-     */
-    private $startTime;
+    private $extras;
 
-    public function __construct($message, $discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $wolframAlpha, $startTime)
+    public function __construct($message, $discord, $channelConfig, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $extras)
     {
         $this->message = $message;
         $this->discord = $discord;
+        $this->channelConfig = $channelConfig;
         $this->log = $log;
         $this->config = $config;
         $this->db = $db;
@@ -78,22 +79,14 @@ class about extends \Threaded implements \Collectable
         $this->permissions = $permissions;
         $this->serverConfig = $serverConfig;
         $this->users = $users;
-        $this->wolframAlpha = $wolframAlpha;
-        $this->startTime = $startTime;
+        $this->extras = $extras;
     }
 
     public function run()
     {
-        $time1 = new DateTime(date("Y-m-d H:i:s", $this->startTime));
+        $time1 = new DateTime(date("Y-m-d H:i:s", $this->extras["startTime"]));
         $time2 = new DateTime(date("Y-m-d H:i:s"));
         $interval = $time1->diff($time2);
-
-        $memberCount = 0;
-        /** @var Guild $guild */
-        foreach ($this->discord->getClient()->getGuildsAttribute()->all() as $guild) {
-            var_dump($guild->getMembersAttribute()->count());
-            $memberCount += $guild->member_count;
-        }
 
         $msg = "```I am the vanguard of your destruction. This exchange is just beginning...
 
@@ -103,8 +96,8 @@ Current Version: 0.0000000000
 Github Repo: https://github.com/karbowiak/Sovereign\
 
 Statistics:
-Server Count: {$this->discord->guilds->count()}
-Member Count: {$memberCount} 
+Guild/Server Count: {$this->discord->guilds->count()} (For specifics use {$this->channelConfig->prefix}guilds)
+Member Count: {$this->extras["memberCount"]} 
 Memory Usage: ~" . round(memory_get_usage() / 1024 / 1024, 3) . "MB
 Uptime: " . $interval->y . " Year(s), " . $interval->m . " Month(s), " . $interval->d . " Days, " . $interval->h . " Hours, " . $interval->i . " Minutes, " . $interval->s . " seconds.
 ```";

@@ -28,6 +28,10 @@ class wolf extends \Threaded implements \Collectable
      */
     private $log;
     /**
+     * @var array
+     */
+    private $channelConfig;
+    /**
      * @var Config
      */
     private $config;
@@ -56,18 +60,15 @@ class wolf extends \Threaded implements \Collectable
      */
     private $users;
     /**
-     * @var \WolframAlpha\Engine
+     * @var array
      */
-    private $wolframAlpha;
-    /**
-     * @var int
-     */
-    private $startTime;
+    private $extras;
 
-    public function __construct($message, $discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $wolframAlpha, $startTime)
+    public function __construct($message, $discord, $channelConfig, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $extras)
     {
         $this->message = $message;
         $this->discord = $discord;
+        $this->channelConfig = $channelConfig;
         $this->log = $log;
         $this->config = $config;
         $this->db = $db;
@@ -76,32 +77,38 @@ class wolf extends \Threaded implements \Collectable
         $this->permissions = $permissions;
         $this->serverConfig = $serverConfig;
         $this->users = $users;
-        $this->wolframAlpha = $wolframAlpha;
-        $this->startTime = $startTime;
+        $this->extras = $extras;
     }
 
     public function run()
     {
         $explode = explode(" ", $this->message->content);
         unset($explode[0]);
-        $query = implode(" ", $explode);
+        $query = urlencode(implode(" ", $explode));
+        $appID = urlencode($this->config->get("appID", "wolframalpha"));
 
-        /** @var \WolframAlpha\QueryResult $result */
-        $result = $this->wolframAlpha->process($query, array(), array("image", "plaintext"));
-        /** @var \WolframAlpha\Pod $pod */
-        $pod = $result->pods["Result"];
+        // WTB JSON endpoint...
+        $data = json_decode(json_encode(new \SimpleXMLElement($this->curl->get("http://api.wolframalpha.com/v2/query?appid={$appID}&input={$query}"))), true);
 
-        if (!empty($pod)) {
-            /** @var \WolframAlpha\Subpod $subPod */
-            $subPod = $pod->subpods[0];
+        $result = $data["pod"][1]["subpod"];
 
-            if (strlen($subPod->img->src) > 0)
-                $this->message->reply("Result: {$subPod->plaintext}\r\n {$subPod->img->src}");
+        if (!empty($result)) {
+            $image = $result["img"]["@attributes"]["src"];
+            $text = $result["plaintext"];
+
+            if (strlen($image) > 0) {
+                $this->message->reply("{$text}\r\n {$image}");
+                $wolfFileName = md5($query);
+                file_put_contents(__DIR__ . "/../../../cache/image/{$wolfFileName}.gif", $image);
+                $this->message->getChannelAttribute()->sendFile(__DIR__ . "/../../../cache/image/{$wolfFileName}.gif", "{$wolfFileName}.gif");
+            }
             else
-                $this->message->reply("Result: {$subPod->plaintext}");
+                $this->message->reply("Result: {$image}");
         } else {
             $this->message->reply("WolframAlpha did not have an answer to your query..");
         }
 
+        // Mark this as garbage
+        $this->isGarbage();
     }
 }

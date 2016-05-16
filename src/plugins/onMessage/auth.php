@@ -4,6 +4,7 @@ namespace Sovereign\Plugins;
 
 use Discord\Discord;
 use Discord\Parts\Channel\Message;
+use Discord\Parts\Guild\Guild;
 use Discord\Parts\Guild\Role;
 use Discord\Parts\User\Member;
 use Monolog\Logger;
@@ -29,6 +30,10 @@ class auth extends \Threaded implements \Collectable
      * @var Logger
      */
     private $log;
+    /**
+     * @var array
+     */
+    private $channelConfig;
     /**
      * @var Config
      */
@@ -58,18 +63,15 @@ class auth extends \Threaded implements \Collectable
      */
     private $users;
     /**
-     * @var \WolframAlpha\Engine
+     * @var array
      */
-    private $wolframAlpha;
-    /**
-     * @var int
-     */
-    private $startTime;
+    private $extras;
 
-    public function __construct($message, $discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $wolframAlpha, $startTime)
+    public function __construct($message, $discord, $channelConfig, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $extras)
     {
         $this->message = $message;
         $this->discord = $discord;
+        $this->channelConfig = $channelConfig;
         $this->log = $log;
         $this->config = $config;
         $this->db = $db;
@@ -78,8 +80,7 @@ class auth extends \Threaded implements \Collectable
         $this->permissions = $permissions;
         $this->serverConfig = $serverConfig;
         $this->users = $users;
-        $this->wolframAlpha = $wolframAlpha;
-        $this->startTime = $startTime;
+        $this->extras = $extras;
     }
 
     public function run()
@@ -95,23 +96,25 @@ class auth extends \Threaded implements \Collectable
         if ($authData) {
             $groups = json_decode($authData["groups"], true);
             $characterID = $authData["characterID"];
-            $roles = $this->message->getChannelAttribute()->getGuildAttribute()->roles;
+            /** @var Role $roles */
+            $roles = $this->message->getFullChannelAttribute()->getGuildAttribute()->getRolesAttribute();
             /** @var Member $member */
-            $member = $this->message->getChannelAttribute()->getGuildAttribute()->getMembersAttribute()->get("id", $this->message->author->id);
+            $member = $this->message->getFullChannelAttribute()->getGuildAttribute()->getMembersAttribute()->get("id", $this->message->author->id);
             $username = $this->message->author->username;
             $discordID = $this->message->author->id;
 
-            // Force ingame name
+            // @todo Force ingame name
             $characterName = json_decode($this->curl->get("https://evedata.xyz/api/character/shortinformation/{$characterID}/"))->characterName;
             // Doesn't work yet, but it should be something like $member->nick($characterName);
-
             //$member->user->setAttribute("username", $characterName);
+
             /** @var Role $role */
             foreach ($roles as $role) {
                 $roleName = $role->name;
                 if (in_array($roleName, $groups))
                     $member->addRole($role);
             }
+
             // Save the member object, so all the roles are set
             $member->save();
 
@@ -121,5 +124,8 @@ class auth extends \Threaded implements \Collectable
         } else {
             $this->message->reply("**Error** You are trying to authenticate with an already used (or not existing) auth token..");
         }
+
+        // Mark this as garbage
+        $this->isGarbage();
     }
 }

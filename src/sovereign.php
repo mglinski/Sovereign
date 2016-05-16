@@ -4,13 +4,12 @@ namespace Sovereign;
 
 use Discord\Cache\Cache;
 use Discord\Cache\Drivers\ArrayCacheDriver;
-use Discord\Cache\Drivers\RedisCacheDriver;
 use Discord\Discord;
-use Discord\Helpers\Guzzle;
 use Discord\Parts\Channel\Message;
 use Discord\Parts\Guild\Guild;
 use Discord\Parts\User\Game;
 use Discord\Parts\WebSockets\PresenceUpdate;
+use Discord\Voice\VoiceClient;
 use Discord\WebSockets\Event;
 use Discord\WebSockets\WebSocket;
 use Monolog\Logger;
@@ -22,7 +21,6 @@ use Sovereign\Lib\Permissions;
 use Sovereign\Lib\ServerConfig;
 use Sovereign\Lib\Settings;
 use Sovereign\Lib\Users;
-use SuperClosure\Serializer;
 
 /**
  * Class Sovereign
@@ -91,9 +89,13 @@ class Sovereign
      */
     private $pool;
     /**
-     * @var int
+     * @var array
      */
-    private $startTime;
+    private $extras = [];
+    /**
+     * @var array
+     */
+    private $activeVoice = [];
 
     /**
      * Sovereign constructor.
@@ -109,22 +111,27 @@ class Sovereign
         $this->settings = $container["settings"];
         $this->permissions = $container["permissions"];
         $this->users = $container["users"];
-        $this->startTime = time();
-        $this->pool = new \Pool(15);
+        $this->extras["startTime"] = time();
+        $this->pool = new \Pool(24, \Worker::class);
 
-        // Fire up the onStart plugins
+        // @todo Fire up the onStart plugins
 
         // Init Discord and Websocket
         $this->log->addInfo("Initializing Discord and Websocket connections..");
         $this->discord = Discord::createWithBotToken($this->config->get("token", "bot"));
-        // Use redis for caching data..
-        //Cache::setCache(new RedisCacheDriver("127.0.0.1", 6379, null, 1));
         Cache::setCache(new ArrayCacheDriver());
-        // Set the Guzzle cache to 0 - so roles update right away
-        Guzzle::setCacheTtl(0);
         $this->websocket = new WebSocket($this->discord);
     }
 
+    /**
+     * @param $type
+     * @param $command
+     * @param $class
+     * @param $perms
+     * @param $description
+     * @param $usage
+     * @param $timer
+     */
     public function addPlugin($type, $command, $class, $perms, $description, $usage, $timer)
     {
         $this->$type[$command] = [
@@ -136,8 +143,20 @@ class Sovereign
         ];
     }
 
+    /**
+     *
+     */
     public function run()
     {
+        // Reap the threads!
+        //$this->websocket->loop->addPeriodicTimer(600, function() {
+        //    $this->log->addInfo("Restarting the threading pool, to clear out old threads..");
+        //    // Shutdown the pool
+        //    $this->pool->shutdown();
+        //    // Startup the pool again
+        //    $this->pool = new \Pool(24, \Worker::class);
+        //});
+
         $this->websocket->on("ready", function (Discord $discord) {
             $this->log->addInfo("Websocket connected..");
 
@@ -145,29 +164,34 @@ class Sovereign
             $game = new Game(array("name" => $this->config->get("presence", "bot", "table flippin'"), "url" => null, "type" => null), true);
             $this->websocket->updatePresence($game, false);
 
+            // Count the amount of people we are available to..
+            /** @var Guild $guild */
+            foreach($this->discord->getClient()->getGuildsAttribute()->all() as $guild) {
+                $this->extras["memberCount"] += $guild->member_count;
+            }
+            
+            $this->log->addInfo("Member count, currently available to: {$this->extras["memberCount"]} people");
+
             // Setup the timers for the timer plugins
             $config = $this->db->query("SELECT settings FROM settings");
             $that = $this;
             foreach ($this->onTimer as $command => $data) {
                 $this->websocket->loop->addPeriodicTimer($data["timer"], function () use ($data, $discord, $that, $config) {
+                    // @todo thread this
                     $data["class"]::onTimer($discord, $this->container, $config);
                 });
             }
 
-            // Foreach guild we'll setup a new cleverbot instance, if one doesn't already exist.
-            /** @var Guild $guild */
-            foreach ($discord->guilds->all() as $guild) {
-                $serverID = $guild->id;
-                $result = $this->curl->post("https://cleverbot.io/1.0/create", ["user" => $this->config->get("user", "cleverbot"), "key" => $this->config->get("key", "cleverbot")]);
-
-                if ($result) {
-                    $result = @json_decode($result);
-                    $nick = isset($result->nick) ? $result->nick : false;
-
-                    if ($nick)
-                        $this->db->execute("INSERT INTO cleverbot (serverID, nick) VALUES (:serverID, :nick) ON DUPLICATE KEY UPDATE nick = :nick", [":serverID" => $serverID, ":nick" => $nick]);
+            // Issue periodically member recount
+            $this->websocket->loop->addPeriodicTimer(600, function() {
+                $this->extras["memberCount"] = 0;
+                /** @var Guild $guild */
+                foreach($this->discord->getClient()->getGuildsAttribute()->all() as $guild) {
+                    $this->extras["memberCount"] += $guild->member_count;
                 }
-            }
+
+                $this->log->addInfo("Member recount, currently available to: {$this->extras["memberCount"]} people");
+            });
         });
 
         $this->websocket->on("error", function ($error, $websocket) {
@@ -189,15 +213,17 @@ class Sovereign
         // Handle incoming message logging
         $this->websocket->on(Event::MESSAGE_CREATE, function (Message $message, Discord $discord) {
             // Ignore if it's from ourselves
-            if ($message->author->id != $discord->user->id) {
+            if ($message->author->id != $discord->getClient()->id) {
                 $this->log->addNotice("Message from {$message->author->username}", [$message->content]);
-                $this->users->set($message->author->id, $message->author->username, "online", "", date("Y-m-d H:i:s"), date("Y-m-d H:i:s"), $message->content);
+                $this->users->set($message->author->id, $message->author->username, "online", null, date("Y-m-d H:i:s"), date("Y-m-d H:i:s"), $message->content);
+
+                // @todo Create text logs
             }
         });
 
         // Handle plugin running
         $this->websocket->on(Event::MESSAGE_CREATE, function (Message $message, Discord $discord) {
-            $guildID = $message->full_channel->guild->id;
+            $guildID = $message->getChannelAttribute()->guild_id;
 
             // Get server config
             $config = $this->settings->get($guildID);
@@ -208,7 +234,7 @@ class Sovereign
                 $message->isAdmin = $admins == $userDiscordID ? true : false;
 
             // Define the prefix if it isn't already set..
-            $config->prefix = isset($config->prefix) ? $config->prefix : $this->config->get("prefix", "bot");
+            @$config->prefix = isset($config->prefix) ? $config->prefix : $this->config->get("prefix", "bot");
 
             // Check if the user requested an onMessage plugin
             if (substr($message->content, 0, strlen($config->prefix)) == $config->prefix) {
@@ -233,8 +259,17 @@ class Sovereign
                             $message->getChannelAttribute()->broadcastTyping();
                             if ($data["class"] == "\\Sovereign\\Plugins\\help") {
                                 $this->showHelp($message, $config);
-                            } else {
-                                $this->pool->submit(new $data["class"]($message, $discord, $this->log, $config, $this->db, $this->curl, $this->settings, $this->permissions, $this->container["serverConfig"], $this->users, $this->container["wolframAlpha"], $this->startTime));
+                            }
+                            // Plugins that shouldn't be threaded... because they behave really fucking wonky (Can't access the Discord Cache)
+                            elseif(in_array($data["class"], array("\\Sovereign\\Plugins\\auth", "\\Sovereign\\Plugins\\about", "\\Sovereign\\Plugins\\guilds"))) {
+                                /** @var \Threaded $plugin */
+                                $plugin = new $data["class"]($message, $discord, $config, $this->log, $this->config, $this->db, $this->curl, $this->settings, $this->permissions, $this->container["serverConfig"], $this->users, $this->extras);
+                                $plugin->run();
+                            }
+                            else {
+                                /** @var \Threaded $plugin */
+                                $plugin = new $data["class"]($message, $discord, $config, $this->log, $this->config, $this->db, $this->curl, $this->settings, $this->permissions, $this->container["serverConfig"], $this->users, $this->extras);
+                                $this->pool->submit($plugin);
                             }
                             $this->log->addInfo("{$message->author->username}#{$message->author->discriminator} ({$message->author}) ran command {$config->prefix}{$command}", $content);
                         }
@@ -243,34 +278,164 @@ class Sovereign
             }
         });
 
+        // Handle joining a voice channel, and playing.. stuff....
+        $this->websocket->on(Event::MESSAGE_CREATE, function(Message $message, Discord $discord) {
+            $guildID = $message->getChannelAttribute()->guild_id;
+
+            // Get server config
+            $config = $this->settings->get($guildID);
+
+            // Define the prefix if it isn't already set..
+            @$config->prefix = isset($config->prefix) ? $config->prefix : $this->config->get("prefix", "bot");
+
+            // 90s Music!
+            if($message->content == $config->prefix . "unleashthe90s") {
+                $voiceChannel = $message->getFullChannelAttribute()->getGuildAttribute()->channels->getAll("type", "voice");
+                foreach($voiceChannel as $channel) {
+                    if(isset($channel->members[$message->author->id])) {
+                        // Get a random song from the 90sbutton playlist
+                        $playlist = json_decode($this->curl->get("http://the90sbutton.com/playlist.php"));
+                        $song = $playlist[array_rand($playlist)];
+
+                        // Now get the mp3 from
+                        $songFile = __DIR__ . "/../cache/songs/{$song->youtubeid}.mp3";
+                        if (!file_exists($songFile)) {
+                            $this->log->addNotice("Downloading {$song->title} by {$song->artist}");
+                            exec("youtube-dl https://www.youtube.com/watch?v={$song->youtubeid} -x --audio-format mp3 -q -o {$songFile}");
+                        }
+
+                        $this->websocket->joinVoiceChannel($channel)->then(function(VoiceClient $vc) use ($message, $discord, $songFile, $song, $channel) {
+                            $vc->setFrameSize(20)->then(function() use ($message, $vc, $songFile, $song, $channel) {
+                                $this->log->addNotice("Now Playing {$song->title} by {$song->artist}");
+                                $message->reply("Now playing **{$song->title}** by **{$song->artist}** in {$channel->name}");
+                                $vc->setBitrate(128);
+                                $vc->playFile($songFile, 2)->done(function () use ($vc) {
+                                    $vc->close();
+                                });
+                            });
+                        });
+                    }
+                }
+            }
+
+            // YouTubeeee
+            if(stristr($message->content, $config->prefix . "yt")) {
+                $voiceChannel = $message->getFullChannelAttribute()->getGuildAttribute()->channels->getAll("type", "voice");
+                foreach($voiceChannel as $channel) {
+                    if(isset($channel->members[$message->author->id])) {
+                        $exp = explode(" ", $message->content);
+                        unset($exp[0]);
+                        $youtubeLink = implode(" ", $exp);
+
+                        // URL Checker
+                        $parts = parse_url($youtubeLink);
+                        if(!stristr($parts["host"], "youtube.com"))
+                            return $message->reply("Error, you can only use youtube links!");
+
+                        $md5 = md5($youtubeLink);
+                        // Now get the mp3 from
+                        $songFile = __DIR__ . "/../cache/songs/{$md5}.mp3";
+                        if (!file_exists($songFile)) {
+                            $this->log->addNotice("Downloading song from YouTube.. {$youtubeLink}");
+                            exec("youtube-dl $youtubeLink -x --audio-format mp3 -q -o {$songFile}");
+                        }
+
+                        $this->websocket->joinVoiceChannel($channel)->then(function(VoiceClient $vc) use ($message, $discord, $songFile, $channel) {
+                            $vc->setFrameSize(20)->then(function() use ($message, $vc, $songFile, $channel) {
+                                $vc->setBitrate(128);
+                                $vc->playFile($songFile, 2)->done(function() use ($vc) {
+                                    $vc->close();
+                                });
+                            });
+                        });
+                    }
+                }
+            }
+
+            // The Reaper Horn
+            if($message->content == $config->prefix . "horn") {
+                $voiceChannel = $message->getFullChannelAttribute()->getGuildAttribute()->channels->getAll("type", "voice");
+                foreach($voiceChannel as $channel) {
+                    if (isset($channel->members[$message->author->id])) {
+                        $this->websocket->joinVoiceChannel($channel)->then(function (VoiceClient $vc) use ($message, $discord) {
+                            $vc->setFrameSize(20)->then(function () use ($vc) {
+                                $vc->setBitrate(128);
+                                $file = __DIR__ . "/../sounds/horn.mp3";
+                                $vc->playFile($file, 2)->done(function () use ($vc) {
+                                    $vc->close();
+                                });
+                            });
+                        });
+                    }
+                }
+            }
+
+            // Random sounds
+            if($message->content == $config->prefix . "reapers") {
+                $voiceChannel = $message->getFullChannelAttribute()->getGuildAttribute()->channels->getAll("type", "voice");
+                foreach ($voiceChannel as $channel) {
+                    if (isset($channel->members[$message->author->id])) {
+                        $this->websocket->joinVoiceChannel($channel)->then(function (VoiceClient $vc) use ($message, $discord) {
+                            $vc->setFrameSize(20)->then(function () use ($vc) {
+                                $vc->setBitrate(128);
+                                $num = rand(1, 23);
+                                $file = __DIR__ . "/../sounds/{$num}.mp3";
+                                $vc->playFile($file, 2)->done(function () use ($vc) {
+                                    $vc->close();
+                                });
+                            });
+                        });
+                    }
+                }
+            }
+        });
+
         // Handle if it's a message for the bot (Cleverbot invocation)
         $this->websocket->on(Event::MESSAGE_CREATE, function (Message $message, Discord $discord) {
             // If we got highlighted we should probably answer back
-            if (stristr($message->content, $discord->getClient()->id)) {
-                $this->pool->submit(new cleverBotMessage($message, $discord, $this->log, $this->config, $this->db, $this->curl, $this->settings, $this->permissions, $this->container["serverConfig"], $this->users, $this->container["wolframAlpha"]));
-            }
+            if (stristr($message->content, $discord->getClient()->id))
+                $this->pool->submit(new cleverBotMessage($message, $discord, $this->log, $this->config, $this->db, $this->curl, $this->settings, $this->permissions, $this->container["serverConfig"], $this->users));
         });
 
         // Handle presence updates
         $this->websocket->on(Event::PRESENCE_UPDATE, function (PresenceUpdate $presenceUpdate) {
             if ($presenceUpdate->user->id && $presenceUpdate->user->username) {
                 $this->log->addInfo("Updating presence info for {$presenceUpdate->user->username}");
-                $game = $presenceUpdate->getGameAttribute()->name ? $presenceUpdate->getGameAttribute()->name : "";
-                $this->users->set($presenceUpdate->user->id, $presenceUpdate->user->username, $presenceUpdate->status, $game, date("Y-m-d H:i:s"), null, null);
+                //$game = $presenceUpdate->getGameAttribute();
+                $this->users->set($presenceUpdate->user->id, $presenceUpdate->user->username, $presenceUpdate->status, null, date("Y-m-d H:i:s"), null, null);
             }
         });
 
         // Handle guild updates (Create a new cleverbot \nick\ for this new guild)
-        $this->websocket->on(Event::GUILD_UPDATE, function (Message $message, Discord $discord) {
-            $this->log->addNotice("Guild update?");
+        $this->websocket->on(Event::GUILD_CREATE, function (Guild $guild) {
+            $this->log->addInfo("Setting up Cleverbot for {$guild->name}");
+            $serverID = $guild->id;
+            $result = $this->curl->post("https://cleverbot.io/1.0/create", ["user" => $this->config->get("user", "cleverbot"), "key" => $this->config->get("key", "cleverbot")]);
+
+            if ($result) {
+                $result = @json_decode($result);
+                $nick = isset($result->nick) ? $result->nick : false;
+
+                if ($nick)
+                    $this->db->execute("INSERT INTO cleverbot (serverID, nick) VALUES (:serverID, :nick) ON DUPLICATE KEY UPDATE nick = :nick", [":serverID" => $serverID, ":nick" => $nick]);
+            }
+        });
+
+        $this->websocket->on(Event::GUILD_UPDATE, function(Message $message, Discord $discord) {
+            $this->log->addInfo("Seems a guild update was triggered????");
             var_dump($message);
-            var_dump($discord);
         });
 
         // Run the websocket, and in turn, the bot!
         $this->websocket->run();
     }
 
+    /**
+     * Shows the help message
+     *
+     * @param Message $message
+     * @param $config
+     */
     public function showHelp(Message $message, $config)
     {
         if (isset($cmd)) {
@@ -290,6 +455,10 @@ class Sovereign
     }
 }
 
+/**
+ * Class cleverBotMessage
+ * @package Sovereign
+ */
 class cleverBotMessage extends \Threaded implements \Collectable
 {
     /** @var Message $message */
@@ -328,12 +497,22 @@ class cleverBotMessage extends \Threaded implements \Collectable
      * @var Users
      */
     private $users;
-    /**
-     * @var \WolframAlpha\Engine
-     */
-    private $wolframAlpha;
 
-    public function __construct($message, $discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $wolframAlpha)
+    /**
+     * cleverBotMessage constructor.
+     * @param $message
+     * @param $discord
+     * @param $log
+     * @param $config
+     * @param $db
+     * @param $curl
+     * @param $settings
+     * @param $permissions
+     * @param $serverConfig
+     * @param $users
+     * @param $wolframAlpha
+     */
+    public function __construct($message, $discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users)
     {
         $this->message = $message;
         $this->discord = $discord;
@@ -345,9 +524,11 @@ class cleverBotMessage extends \Threaded implements \Collectable
         $this->permissions = $permissions;
         $this->serverConfig = $serverConfig;
         $this->users = $users;
-        $this->wolframAlpha = $wolframAlpha;
     }
 
+    /**
+     *
+     */
     public function run()
     {
         $guildID = $this->message->getFullChannelAttribute()->guild_id;
@@ -355,7 +536,7 @@ class cleverBotMessage extends \Threaded implements \Collectable
         $cleverBotNick = $this->db->queryField("SELECT nick FROM cleverbot WHERE serverID = :serverID", "nick", array(":serverID" => $guildID));
 
         $msg = str_replace("<@{$this->discord->getClient()->id}>", $this->discord->getClient()->username, $this->message->content);
-        $response = $this->curl->post("https://cleverbot.io/1.0/ask", array("user" => $this->config->get("user", "cleverbot"), "key" => $this->config->get("key", "cleverbot"), "nick2 => $cleverBotNick", "text" => $msg));
+        $response = $this->curl->post("https://cleverbot.io/1.0/ask", array("user" => $this->config->get("user", "cleverbot"), "key" => $this->config->get("key", "cleverbot"), "nick" => $cleverBotNick, "text" => $msg));
 
         if ($response) {
             $resp = @json_decode($response);
