@@ -1,6 +1,6 @@
 <?php
 
-namespace Sovereign\Plugins;
+namespace Sovereign\Plugins\onMessage;
 
 use DateTime;
 use Discord\Discord;
@@ -96,8 +96,8 @@ Current Version: 0.0000000000
 Github Repo: https://github.com/karbowiak/Sovereign\
 
 Statistics:
-Guild/Server Count: {$this->discord->guilds->count()} (For specifics use {$this->channelConfig->prefix}guilds)
-Member Count: {$this->extras["memberCount"]} 
+Guild/Server Count: {$this->extras["guildCount"]} (For specifics use {$this->channelConfig->prefix}guilds)
+Member Count: {$this->extras["memberCount"]}
 Memory Usage: ~" . round(memory_get_usage() / 1024 / 1024, 3) . "MB
 Uptime: " . $interval->y . " Year(s), " . $interval->m . " Month(s), " . $interval->d . " Days, " . $interval->h . " Hours, " . $interval->i . " Minutes, " . $interval->s . " seconds.
 ```";

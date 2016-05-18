@@ -1,6 +1,6 @@
 <?php
 
-namespace Sovereign\Plugins;
+namespace Sovereign\Plugins\onMessage;
 
 use Discord\Discord;
 use Discord\Parts\Channel\Message;
@@ -173,14 +173,25 @@ class porn extends \Threaded implements \Collectable
                 case "cosplay":
                     $urls = array("https://api.imgur.com/3/gallery/r/cosplay/time/all/");
                     break;
+                case "tits":
+                case "breasts":
                 case "boobs":
                     $urls = array("https://api.imgur.com/3/gallery/r/boobs/time/all/");
                     break;
                 case "ass":
                     $urls = array("https://api.imgur.com/3/gallery/r/ass/time/all/");
                     break;
+                case "food":
+                    $urls = array("https://api.imgur.com/3/gallery/r/foodporn/time/all/");
+                    break;
+                case "cheese":
+                case "dick":
+                case "dong":
+                case "penis":
+                    $urls = array("https://api.imgur.com/3/gallery/r/penis/time/all/");
+                    break;
                 default:
-                    $msg = "No endpoint selected. Currently available are: redheads, blondes, asians, gonewild, realgirls, palegirls, gif, lesbians, tattoos, mgw/militarygonewild, amateur, college, bondage, milf, freckles, boobs, ass and cosplay";
+                    $msg = "No endpoint selected. Currently available are: redheads, blondes, asians, gonewild, realgirls, palegirls, gif, lesbians, tattoos, mgw/militarygonewild, amateur, college, bondage, milf, freckles, boobs, ass, food and cosplay";
                     $this->message->reply($msg);
                     break;
             }

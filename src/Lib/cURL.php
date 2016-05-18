@@ -30,7 +30,7 @@ class cURL {
 
             return $result;
         } catch (\Exception $e) {
-            $this->log->addError("There was an error using cURL", [$e->getMessage()]);
+            $this->log->addError("There was an error using cURL: ", [$e->getMessage()]);
         }
     }
 
@@ -55,7 +55,7 @@ class cURL {
 
             return $result;
         } catch (\Exception $e) {
-            $this->log->addError("There was an error using cURL", [$e->getMessage()]);
+            $this->log->addError("There was an error using cURL: ", [$e->getMessage()]);
         }
 
     }

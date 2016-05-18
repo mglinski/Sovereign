@@ -1,6 +1,6 @@
 <?php
 
-namespace Sovereign\Plugins;
+namespace Sovereign\Plugins\onMessage;
 
 use Discord\Discord;
 use Discord\Parts\Channel\Message;
@@ -86,8 +86,11 @@ class guilds extends \Threaded implements \Collectable
         $guilds = $this->discord->guilds->all();
         $list = "";
         /** @var Guild $guild */
-        foreach ($guilds as $guild)
-            $list .= "{$guild->name} | ";
+        foreach ($guilds as $guild) {
+            $guildID = $guild->getAttribute("id");
+            $memberCount = $this->extras["guild"]["memberCount"]["id{$guildID}"];
+            $list .= "{$guild->getAttribute("name")} ({$memberCount}) | ";
+        }
 
         $this->message->reply("I am on the following servers: " . rtrim($list, ", "));
 

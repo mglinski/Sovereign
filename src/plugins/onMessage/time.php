@@ -1,6 +1,6 @@
 <?php
 
-namespace Sovereign\Plugins;
+namespace Sovereign\Plugins\onMessage;
 
 use DateTime;
 use DateTimeZone;

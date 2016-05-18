@@ -1,6 +1,6 @@
 <?php
 
-namespace Sovereign\Plugins;
+namespace Sovereign\Plugins\onMessage;
 
 use Discord\Discord;
 use Discord\Parts\Channel\Message;

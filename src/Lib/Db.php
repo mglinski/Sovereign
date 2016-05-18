@@ -37,7 +37,7 @@ class Db
                 \PDO::MYSQL_ATTR_INIT_COMMAND => "SET time_zone = '+00:00',NAMES utf8;"
             ));
         } catch (\Exception $e) {
-            $this->log->addCritical("Unable to connect to database", [$e->getMessage()]);
+            $this->log->addCritical("Unable to connect to database: ", [$e->getMessage()]);
             die();
         }
 
@@ -58,7 +58,7 @@ class Db
 
             return $result;
         } catch (\Exception $e) {
-            $this->log->addError("There was an error during a query", [$e->getMessage()]);
+            $this->log->addError("There was an error during a query: ", [$e->getMessage()]);
             try {
                 $this->pdo = $this->connect();
             } catch (\Exception $e2) {
@@ -106,7 +106,7 @@ class Db
 
             return $returnID;
         } catch (\Exception $e) {
-            $this->log->addError("There was an error during a query", [$e->getMessage()]);
+            $this->log->addError("There was an error during a query: ", [$e->getMessage()]);
             try {
                 $this->pdo = $this->connect();
             } catch (\Exception $e2) {

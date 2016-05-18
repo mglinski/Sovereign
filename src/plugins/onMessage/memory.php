@@ -13,7 +13,7 @@ use Sovereign\Lib\ServerConfig;
 use Sovereign\Lib\Settings;
 use Sovereign\Lib\Users;
 
-class item extends \Threaded implements \Collectable
+class memory extends \Threaded implements \Collectable
 {
     /**
      * @var Message
@@ -82,24 +82,9 @@ class item extends \Threaded implements \Collectable
 
     public function run()
     {
-        $explode = explode(" ", $this->message->content);
-        unset($explode[0]);
-        $item = implode(" ", $explode);
-
-        if (is_numeric($item)) {
-            $data = $this->db->queryRow("SELECT * FROM invTypes WHERE typeID = :typeID", array(":typeID" => $item));
-        } else {
-            $data = $this->db->queryRow("SELECT * FROM invTypes WHERE typeName = :typeName", array(":typeName" => $item));
-        }
-
-        if ($data) {
-            $msg = "```";
-            foreach ($data as $key => $value)
-                $msg .= $key . ": " . $value . "\n";
-            $msg .= "```";
-
-            $this->message->reply($msg);
-        }
+        $this->message->reply("Memory in use before garbage collection: " . memory_get_usage() / 1024 / 1024 . "MB");
+        gc_collect_cycles();
+        $this->message->reply("Memory in use after garbage collection: " . memory_get_usage() / 1024 / 1024 . "MB");
 
         // Mark this as garbage
         $this->isGarbage();

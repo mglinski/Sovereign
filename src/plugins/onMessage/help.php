@@ -1,5 +1,4 @@
 <?php
-
 namespace Sovereign\Plugins\onMessage;
 
 use Discord\Discord;
@@ -13,7 +12,11 @@ use Sovereign\Lib\ServerConfig;
 use Sovereign\Lib\Settings;
 use Sovereign\Lib\Users;
 
-class item extends \Threaded implements \Collectable
+/**
+ * Class cleverBotMessage
+ * @package Sovereign
+ */
+class help extends \Threaded implements \Collectable
 {
     /**
      * @var Message
@@ -62,7 +65,7 @@ class item extends \Threaded implements \Collectable
     /**
      * @var array
      */
-    private $extras;
+    private $onMessagePlugins;
 
     public function __construct($message, $discord, $channelConfig, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $extras)
     {
@@ -77,31 +80,27 @@ class item extends \Threaded implements \Collectable
         $this->permissions = $permissions;
         $this->serverConfig = $serverConfig;
         $this->users = $users;
-        $this->extras = $extras;
+        $this->onMessagePlugins = $extras["onMessagePlugins"];
     }
 
+    /**
+     *
+     */
     public function run()
     {
-        $explode = explode(" ", $this->message->content);
-        unset($explode[0]);
-        $item = implode(" ", $explode);
-
-        if (is_numeric($item)) {
-            $data = $this->db->queryRow("SELECT * FROM invTypes WHERE typeID = :typeID", array(":typeID" => $item));
+        if (isset($cmd)) {
+            foreach ($this->onMessagePlugins as $command => $data) {
+                if ($command == $cmd) {
+                    $this->message->reply("**{$this->channelConfig->prefix}{$command}** _{$data["usage"]}_\r\n {$data["description"]}");
+                }
+            }
         } else {
-            $data = $this->db->queryRow("SELECT * FROM invTypes WHERE typeName = :typeName", array(":typeName" => $item));
-        }
-
-        if ($data) {
-            $msg = "```";
-            foreach ($data as $key => $value)
-                $msg .= $key . ": " . $value . "\n";
-            $msg .= "```";
+            $msg = "**Commands:** \r\n";
+            foreach ($this->onMessagePlugins as $command => $data) {
+                $msg .= "**{$this->channelConfig->prefix}{$command}** | ";
+            }
 
             $this->message->reply($msg);
         }
-
-        // Mark this as garbage
-        $this->isGarbage();
     }
 }
