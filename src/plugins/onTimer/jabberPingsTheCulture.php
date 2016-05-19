@@ -3,41 +3,103 @@
 namespace Sovereign\Plugins\onTimer;
 
 use Discord\Discord;
-use Discord\Parts\Channel\Message;
+use Discord\Parts\Channel\Channel;
 use Monolog\Logger;
-use Pimple\Container;
-use Sovereign\Sovereign;
+use Sovereign\Lib\Config;
+use Sovereign\Lib\cURL;
+use Sovereign\Lib\Db;
+use Sovereign\Lib\Permissions;
+use Sovereign\Lib\ServerConfig;
+use Sovereign\Lib\Settings;
+use Sovereign\Lib\Users;
 
-class jabberPingsTheCulture {
+class jabberPingsTheCulture extends \Threaded implements \Collectable {
+    /**
+     * @var Discord
+     */
+    protected $discord;
+    /**
+     * @var Logger
+     */
+    protected $log;
+    /**
+     * @var Config
+     */
+    protected $config;
+    /**
+     * @var Db
+     */
+    protected $db;
+    /**
+     * @var cURL
+     */
+    protected $curl;
+    /**
+     * @var Settings
+     */
+    protected $settings;
+    /**
+     * @var Permissions
+     */
+    protected $permissions;
+    /**
+     * @var ServerConfig
+     */
+    protected $serverConfig;
+    /**
+     * @var Users
+     */
+    protected $users;
+    /**
+     * @var array
+     */
+    protected $extras;
+    
+    public function __construct($discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $extras) {
+        $this->discord = $discord;
+        $this->log = $log;
+        $this->config = $config;
+        $this->db = $db;
+        $this->curl = $curl;
+        $this->settings = $settings;
+        $this->permissions = $permissions;
+        $this->serverConfig = $serverConfig;
+        $this->users = $users;
+        $this->extras = $extras;
+    }
 
-    public static function onTimer(Discord $discord, $container, $config) {
-        // @todo This really needs to be made pretty - and per. server configurable - somehow.... (Maybe using sockets?)
-        $data = file("/tmp/discord.db");
-        /** @var Logger $log */
-        $log = $container["log"];
+    public function run() {
+        $handle = fopen("/tmp/discord.db", "r+");
+        flock($handle, LOCK_EX);
 
-        if($data) {
-            $message = "";
-            foreach($data as $row) {
+        $message = "";
+        while($row = fgets($handle)) {
+            if(!empty($row)) {
                 $row = str_replace("\n", "", str_replace("\r", "", str_replace("^@", "", $row)));
-                if($row == "" || $row == " ")
+                if ($row == "" || $row == " ")
                     continue;
 
                 $message .= $row . " | ";
-                usleep(100000);
             }
+        }
 
+        if(!empty($message)) {
+            // Strip out the last |
             $message = trim(substr($message, 0, -2));
             $channelID = 154221481625124864;
-            $channel = \Discord\Parts\Channel\Channel::find($channelID);
-            $log->addInfo("Sending ping to #pings on The Culture");
+            /** @var Channel $channel */
+            $channel = Channel::find($channelID);
+            $this->log->addInfo("Sending ping to #pings on The Culture");
             $channel->sendMessage("@everyone " . $message);
         }
 
+        flock($handle, LOCK_UN);
+        fclose($handle);
         $handle = fopen("/tmp/discord.db", "w+");
         fclose($handle);
         chmod("/tmp/discord.db", 0777);
         $data = null;
         $handle = null;
+        clearstatcache();
     }
 }

@@ -21,7 +21,6 @@ use Sovereign\Lib\Permissions;
 use Sovereign\Lib\Settings;
 use Sovereign\Lib\Users;
 use Sovereign\Plugins\onMessage\cleverBotMessage;
-use Sovereign\Plugins\onMessage\help;
 
 /**
  * Class Sovereign
@@ -33,10 +32,6 @@ class Sovereign
      * @var WebSocket
      */
     public $websocket;
-    /**
-     * @var
-     */
-    public $voice;
     /**
      * @var Discord
      */
@@ -80,7 +75,7 @@ class Sovereign
     /**
      * @var array
      */
-    private $onStart = [];
+    private $onVoice = [];
     /**
      * @var array
      */
@@ -89,6 +84,18 @@ class Sovereign
      * @var \Pool
      */
     private $pool;
+    /**
+     * @var \Pool
+     */
+    private $timers;
+    /**
+     * @var \Pool
+     */
+    public $voice;
+    /**
+     * @var array
+     */
+    private $audioStreams;
     /**
      * @var array
      */
@@ -112,8 +119,8 @@ class Sovereign
         $this->extras["memberCount"] = 0;
         $this->extras["guildCount"] = 0;
         $this->pool = new \Pool(24, \Worker::class);
-
-        // @todo Fire up the onStart plugins
+        $this->timers = new \Pool(4, \Worker::class);
+        $this->voice = new \Pool(24, \Worker::class);
 
         // Init Discord and Websocket
         $this->log->addInfo("Initializing Discord and Websocket connections..");
@@ -134,7 +141,7 @@ class Sovereign
      */
     public function addPlugin($type, $command, $class, $perms, $description, $usage, $timer)
     {
-        $this->log->addInfo("Enabling plugin: {$command}");
+        $this->log->addInfo("Adding plugin: {$command}");
         $this->$type[$command] = [
             "permissions" => $perms,
             "class" => $class,
@@ -151,11 +158,21 @@ class Sovereign
     {
         // Reap the threads!
         $this->websocket->loop->addPeriodicTimer(600, function() {
+            // Only restart the audioStream pool if it's actually empty..
+            if(empty($this->voice)) {
+                $this->voice->shutdown();
+                $this->voice = new \Pool(24, \Worker::class);
+            }
+                
             $this->log->addInfo("Restarting the threading pool, to clear out old threads..");
+
             // Shutdown the pool
             $this->pool->shutdown();
+            $this->timers->shutdown();
+
             // Startup the pool again
             $this->pool = new \Pool(24, \Worker::class);
+            $this->timers = new \Pool(4, \Worker::class);
         });
 
         // Handle the onReady event, and setup some timers and so forth
@@ -173,29 +190,34 @@ class Sovereign
                 $this->extras["guildCount"] = $this->extras["guildCount"] + 1;
                 $this->extras["guild"]["memberCount"]["id{$guild->id}"] = $guild->member_count;
                 $this->extras["onMessagePlugins"] = $this->onMessage;
+                $this->extras["onVoicePlugins"] = $this->onVoice;
             }
             
             $this->log->addInfo("Member count, currently available to: {$this->extras["memberCount"]} people");
 
             // Setup the timers for the timer plugins
-            $config = $this->db->query("SELECT settings FROM settings");
-            $that = $this;
             foreach ($this->onTimer as $command => $data) {
-                $this->websocket->loop->addPeriodicTimer($data["timer"], function () use ($data, $discord, $that, $config) {
-                    // @todo thread this
-                    $data["class"]::onTimer($discord, $this->container, $config);
+                $this->websocket->loop->addPeriodicTimer($data["timer"], function () use ($data, $discord) {
+                    try {
+                        $plugin = new $data["class"]($discord, $this->log, $this->globalConfig, $this->db, $this->curl, $this->settings, $this->permissions, $this->container["serverConfig"], $this->users, $this->extras);
+                        $this->timers->submit($plugin);
+                    } catch (\Exception $e) {
+                        $this->log->addError("Error running the periodic timer: {$e->getMessage()}");
+                    }
                 });
             }
 
             // Issue periodically member recount
             $this->websocket->loop->addPeriodicTimer(600, function() {
                 $this->extras["memberCount"] = 0;
+                $this->extras["guildCount"] = 0;
                 /** @var Guild $guild */
                 foreach($this->discord->getClient()->getGuildsAttribute()->all() as $guild) {
                     $this->extras["memberCount"] += $guild->member_count;
-                    $this->extras["guildCount"] = $this->extras["guildCount"] + 1;
+                    $this->extras["guildCount"] += 1;
                     $this->extras["guild"]["memberCount"]["id{$guild->id}"] = $guild->member_count;
                     $this->extras["onMessagePlugins"] = $this->onMessage;
+                    $this->extras["onVoicePlugins"] = $this->onVoice;
                 }
 
                 $this->log->addInfo("Member recount, currently available to: {$this->extras["memberCount"]} people");
@@ -203,7 +225,7 @@ class Sovereign
         });
 
         $this->websocket->on("error", function ($error, $websocket) {
-            $this->log->addError("An error occured on the websocket", [$error->getMessage()]);
+            $this->log->addError("An error occurred on the websocket", [$error->getMessage()]);
         });
 
         $this->websocket->on("close", function ($opCode, $reason) {
@@ -254,17 +276,16 @@ class Sovereign
                             $parts[] = $p;
 
                     if ($parts[0] == $config->prefix . $command) {
-                        $ownerID = $message->getChannelAttribute()->getGuildAttribute()->owner_id;
                         // If they are listed under the admins array in the bot config, they're the super admins
                         if(in_array($message->author->id, $this->globalConfig->get("admins", "permissions")))
                             $userPerms = 3;
                         // If they are guild owner, they're automatically getting permission level 2
-                        elseif($message->author->id == $ownerID)
+                        elseif(isset($message->getChannelAttribute()->getGuildAttribute()->owner_id) && ($message->author->id == $message->getChannelAttribute()->getGuildAttribute()->owner_id))
                             $userPerms = 2;
                         // Everyone else are just users
                         else
                             $userPerms = 1;
-                        echo $userPerms;
+
                         if ($userPerms >= $data["permissions"]) {
                             try {
                                 $message->getChannelAttribute()->broadcastTyping();
@@ -290,130 +311,36 @@ class Sovereign
 
         // Handle joining a voice channel, and playing.. stuff....
         $this->websocket->on(Event::MESSAGE_CREATE, function(Message $message, Discord $discord) {
+            // Get the guildID
             $guildID = $message->getChannelAttribute()->guild_id;
-
-            // Get server config
+            
+            // Get this guilds settings
             $config = $this->settings->get($guildID);
-
-            // Define the prefix if it isn't already set..
+            
+            // Get the prefix for this guild
             @$config->prefix = isset($config->prefix) ? $config->prefix : $this->globalConfig->get("prefix", "bot");
 
-            // 90s Music!
-            if($message->content == $config->prefix . "unleashthe90s") {
-                $voiceChannel = $message->getFullChannelAttribute()->getGuildAttribute()->channels->getAll("type", "voice");
-                foreach($voiceChannel as $channel) {
-                    if(isset($channel->members[$message->author->id])) {
-                        // Get a random song from the 90sbutton playlist
-                        $playlist = json_decode($this->curl->get("http://the90sbutton.com/playlist.php"));
-                        $song = $playlist[array_rand($playlist)];
+            if (substr($message->content, 0, strlen($config->prefix)) == $config->prefix) {
+                foreach ($this->onVoice as $command => $data) {
+                    $parts = [];
+                    $content = explode(" ", $message->content);
+                    foreach ($content as $index => $c)
+                        foreach (explode("\n", $c) as $p)
+                            $parts[] = $p;
 
-                        // Now get the mp3 from
-                        $songFile = __DIR__ . "/../cache/songs/{$song->youtubeid}.mp3";
-                        if (!file_exists($songFile)) {
-                            $this->log->addNotice("Downloading {$song->title} by {$song->artist}");
-                            exec("youtube-dl https://www.youtube.com/watch?v={$song->youtubeid} -x --audio-format mp3 -q -o {$songFile}");
+                    if ($parts[0] == $config->prefix . $command) {
+                        try {
+                            $voiceChannels = $message->getFullChannelAttribute()->getGuildAttribute()->channels->getAll("type", "voice");
+                            foreach ($voiceChannels as $channel) {
+                                if (!empty($channel->members[$message->author->id])) {
+                                    $voice = new $data["class"]();
+                                    $voice->run($message, $discord, $this->websocket, $this->log, $this->audioStreams, $channel, $this->curl);
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            $this->log->addError("Error running voice command {$config->prefix}{$command}. Command run by {$message->author->username} in {$message->getChannelAttribute()->name}. Error: {$e->getMessage()}");
+                            $message->reply("**Error:** There was a problem running the command: {$e->getMessage()}");
                         }
-
-                        $this->websocket->joinVoiceChannel($channel)->then(function(VoiceClient $vc) use ($message, $discord, $songFile, $song, $channel) {
-                            $vc->setFrameSize(20)->then(function() use ($message, $vc, $songFile, $song, $channel) {
-                                $this->log->addNotice("Now Playing {$song->title} by {$song->artist}");
-                                $message->reply("Now playing **{$song->title}** by **{$song->artist}** in {$channel->name}");
-                                $vc->setBitrate(128);
-                                $vc->playFile($songFile, 2)->done(function () use ($vc) {
-                                    $vc->close();
-                                });
-                            });
-                        });
-                    }
-                }
-            }
-
-            // YouTubeeee
-            if(stristr($message->content, $config->prefix . "yt")) {
-                $voiceChannel = $message->getFullChannelAttribute()->getGuildAttribute()->channels->getAll("type", "voice");
-                foreach($voiceChannel as $channel) {
-                    if(isset($channel->members[$message->author->id])) {
-                        $exp = explode(" ", $message->content);
-                        unset($exp[0]);
-                        $youtubeLink = implode(" ", $exp);
-
-                        // URL Checker
-                        $parts = parse_url($youtubeLink);
-                        if(!stristr($parts["host"], "youtube.com"))
-                            return $message->reply("Error, you can only use youtube links!");
-
-                        $md5 = md5($youtubeLink);
-                        // Now get the mp3 from
-                        $songFile = __DIR__ . "/../cache/songs/{$md5}.mp3";
-                        if (!file_exists($songFile)) {
-                            $this->log->addNotice("Downloading song from YouTube.. {$youtubeLink}");
-                            exec("youtube-dl $youtubeLink -x --audio-format mp3 -q -o {$songFile}");
-                        }
-
-                        $this->websocket->joinVoiceChannel($channel)->then(function(VoiceClient $vc) use ($message, $discord, $songFile, $channel) {
-                            $vc->setFrameSize(20)->then(function() use ($message, $vc, $songFile, $channel) {
-                                $vc->setBitrate(128);
-                                $vc->playFile($songFile, 2)->done(function() use ($vc) {
-                                    $vc->close();
-                                });
-                            });
-                        });
-                    }
-                }
-            }
-
-            // The Reaper Horn
-            if($message->content == $config->prefix . "horn") {
-                $voiceChannel = $message->getFullChannelAttribute()->getGuildAttribute()->channels->getAll("type", "voice");
-                foreach($voiceChannel as $channel) {
-                    if (isset($channel->members[$message->author->id])) {
-                        $this->websocket->joinVoiceChannel($channel)->then(function (VoiceClient $vc) use ($message, $discord) {
-                            $vc->setFrameSize(20)->then(function () use ($vc) {
-                                $vc->setBitrate(128);
-                                $file = __DIR__ . "/../sounds/reapers/horn.mp3";
-                                $vc->playFile($file, 2)->done(function () use ($vc) {
-                                    $vc->close();
-                                });
-                            });
-                        });
-                    }
-                }
-            }
-
-            // Random reaper sounds
-            if($message->content == $config->prefix . "reapers") {
-                $voiceChannel = $message->getFullChannelAttribute()->getGuildAttribute()->channels->getAll("type", "voice");
-                foreach ($voiceChannel as $channel) {
-                    if (isset($channel->members[$message->author->id])) {
-                        $this->websocket->joinVoiceChannel($channel)->then(function (VoiceClient $vc) use ($message, $discord) {
-                            $vc->setFrameSize(20)->then(function () use ($vc) {
-                                $vc->setBitrate(128);
-                                $num = mt_rand(1, 23);
-                                $file = __DIR__ . "/../sounds/reapers/{$num}.mp3";
-                                $vc->playFile($file, 2)->done(function () use ($vc) {
-                                    $vc->close();
-                                });
-                            });
-                        });
-                    }
-                }
-            }
-
-            // Random EVE warning sounds
-            if($message->content == $config->prefix . "warnings") {
-                $voiceChannel = $message->getFullChannelAttribute()->getGuildAttribute()->channels->getAll("type", "voice");
-                foreach ($voiceChannel as $channel) {
-                    if (isset($channel->members[$message->author->id])) {
-                        $this->websocket->joinVoiceChannel($channel)->then(function (VoiceClient $vc) use ($message, $discord) {
-                            $vc->setFrameSize(20)->then(function () use ($vc) {
-                                $vc->setBitrate(128);
-                                $num = mt_rand(1, 6);
-                                $file = __DIR__ . "/../sounds/eve/{$num}.mp3";
-                                $vc->playFile($file, 2)->done(function () use ($vc) {
-                                    $vc->close();
-                                });
-                            });
-                        });
                     }
                 }
             }
@@ -436,8 +363,8 @@ class Sovereign
             if ($presenceUpdate->user->id && $presenceUpdate->user->username) {
                 try {
                     $this->log->addInfo("Updating presence info for {$presenceUpdate->user->username}");
-                    //$game = $presenceUpdate->getGameAttribute();
-                    $this->users->set($presenceUpdate->user->id, $presenceUpdate->user->username, $presenceUpdate->status, null, date("Y-m-d H:i:s"), null, null);
+                    $game = isset($presenceUpdate->getGameAttribute()->name) ? $presenceUpdate->getGameAttribute()->name : null;
+                    $this->users->set($presenceUpdate->user->id, $presenceUpdate->user->username, $presenceUpdate->status, $game, date("Y-m-d H:i:s"), null, null);
                 } catch (\Exception $e) {
                     $this->log->addError("Error: {$e->getMessage()}");
                 }

@@ -86,7 +86,8 @@ class pc extends \Threaded implements \Collectable
         $explode = explode(" ", $this->message->content);
         $prefix = $this->channelConfig->prefix;
         $system = isset($explode[0]) ? $explode[0] == "{$prefix}pc" ? "global" : str_replace($prefix, "", $explode[0]) : "global";
-        $item = isset($explode[1]) ? $explode[1] : "";
+        unset($explode[0]);
+        $item = implode(" ", $explode);
 
         // Stuff that doesn't need a db lookup
         $quickLookUps = [

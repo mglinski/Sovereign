@@ -30,6 +30,7 @@ try {
 }
 
 // Add all the plugins
+// onMessage plugins
 $bot->addPlugin("onMessage", "about", "\\Sovereign\\Plugins\\onMessage\\about", 1, "Shows information about the bot and it's creator", "", null);
 $bot->addPlugin("onMessage", "auth", "\\Sovereign\\Plugins\\onMessage\\auth", 1, "Authenticates you against a login with certain restrictions", "<authCode>", null);
 $bot->addPlugin("onMessage", "char", "\\Sovereign\\Plugins\\onMessage\\char", 1, "Fetches data from EVE-KILL about a character", "<characterName>", null);
@@ -55,8 +56,22 @@ $bot->addPlugin("onMessage", "user", "\\Sovereign\\Plugins\\onMessage\\user", 1,
 $bot->addPlugin("onMessage", "wolf", "\\Sovereign\\Plugins\\onMessage\\wolf", 1, "Asks wolframAlpha a question, and returns the result", "<question>", null);
 $bot->addPlugin("onMessage", "help", "\\Sovereign\\Plugins\\onMessage\\help", 1, "Shows helpfull information about all the plugins available", null, null);
 $bot->addPlugin("onMessage", "memory", "\\Sovereign\\Plugins\\onMessage\\memory", 3, "Triggers garbage collection", null, null);
+
+// onTimer plugins
 $bot->addPlugin("onTimer", "memory", "\\Sovereign\\Plugins\\onTimer\\memory", 1, "", "", 1800);
 $bot->addPlugin("onTimer", "jabberPingsTheCulture", "\\Sovereign\\Plugins\\onTimer\\jabberPingsTheCulture", 1, "", "", 1);
+$bot->addPlugin("onTimer", "kills", "\\Sovereign\\Plugins\\onTimer\\kills", 1, "", "", 15);
 
+// onVoice plugins
+$bot->addPlugin("onVoice", "reapers", "\\Sovereign\\Plugins\\onVoice\\reapers", 1, "Plays a random quote from Sovereign", "", null);
+$bot->addPlugin("onVoice", "horn", "\\Sovereign\\Plugins\\onVoice\\horn", 1, "Plays the charactaristic sound of a reaper", "", null);
+$bot->addPlugin("onVoice", "pause", "\\Sovereign\\Plugins\\onVoice\\pause", 1, "Pauses audio playback", "", null);
+$bot->addPlugin("onVoice", "stop", "\\Sovereign\\Plugins\\onVoice\\stop", 1, "Stops audio playback", "", null);
+$bot->addPlugin("onVoice", "unpause", "\\Sovereign\\Plugins\\onVoice\\unpause", 1, "Resumes audio playback", "", null);
+$bot->addPlugin("onVoice", "resume", "\\Sovereign\\Plugins\\onVoice\\unpause", 1, "Resumes audio playback", "", null);
+$bot->addPlugin("onVoice", "warnings", "\\Sovereign\\Plugins\\onVoice\\warnings", 1, "Plays a random warning sound from EVE-Online", "", null);
+$bot->addPlugin("onVoice", "unleashthe90s", "\\Sovereign\\Plugins\\onVoice\\unleashthe90s", 1, "Plays a random 90s song", "", null);
+$bot->addPlugin("onVoice", "youtube", "\\Sovereign\\Plugins\\onVoice\\youtube", 1, "Plays whatever is linked in the youtube link", "<youtubeLink>", null);
+$bot->addPlugin("onVoice", "yt", "\\Sovereign\\Plugins\\onVoice\\youtube", 1, "Plays whatever is linked in the youtube link", "<youtubeLink>", null);
 // Launch the bot
 $bot->run();

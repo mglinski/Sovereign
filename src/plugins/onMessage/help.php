@@ -66,6 +66,7 @@ class help extends \Threaded implements \Collectable
      * @var array
      */
     private $onMessagePlugins;
+    private $onVoicePlugins;
 
     public function __construct($message, $discord, $channelConfig, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $extras)
     {
@@ -81,6 +82,7 @@ class help extends \Threaded implements \Collectable
         $this->serverConfig = $serverConfig;
         $this->users = $users;
         $this->onMessagePlugins = $extras["onMessagePlugins"];
+        $this->onVoicePlugins = $extras["onVoicePlugins"];
     }
 
     /**
@@ -88,15 +90,21 @@ class help extends \Threaded implements \Collectable
      */
     public function run()
     {
+        $explode = explode(" ", $this->message->content);
+        $cmd = isset($explode[1]) ? $explode[1] : null;
+        $plugins = (object) array_merge((array) $this->onMessagePlugins, (array) $this->onVoicePlugins);
         if (isset($cmd)) {
-            foreach ($this->onMessagePlugins as $command => $data) {
+            foreach ($plugins as $command => $data) {
                 if ($command == $cmd) {
-                    $this->message->reply("**{$this->channelConfig->prefix}{$command}** _{$data["usage"]}_\r\n {$data["description"]}");
+                    if($data["usage"])
+                        $this->message->reply("**{$this->channelConfig->prefix}{$command}** _{$data["usage"]}_\r\n {$data["description"]}");
+                    else
+                        $this->message->reply("**{$this->channelConfig->prefix}{$command}** \r\n {$data["description"]}");
                 }
             }
         } else {
             $msg = "**Commands:** \r\n";
-            foreach ($this->onMessagePlugins as $command => $data) {
+            foreach ($plugins as $command => $data) {
                 $msg .= "**{$this->channelConfig->prefix}{$command}** | ";
             }
 
