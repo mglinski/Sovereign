@@ -16,7 +16,7 @@ class pause
         $guildID = $channel->guild_id;
         if(isset($audioStreams[$guildID])) {
             $audioStreams[$guildID]->pause();
-            $message->reply("Audio stopped");
+            $message->reply("Pausing audio playback..");
         }
     }
 }

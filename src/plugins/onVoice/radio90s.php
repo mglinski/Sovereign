@@ -14,9 +14,40 @@ use YoutubeDl\Exception\NotFoundException;
 use YoutubeDl\Exception\PrivateVideoException;
 use YoutubeDl\YoutubeDl;
 
-class unleashthe90s
+class radio90s
 {
     public function run(Message $message, Discord $discord, WebSocket $webSocket, Logger $log, &$audioStreams, Channel $channel, cURL $curl)
+    {
+        $webSocket->joinVoiceChannel($channel)->then(function (VoiceClient $vc) use ($message, $discord, $webSocket, $log, &$audioStreams, $channel, $curl) {
+            $guildID = $message->getChannelAttribute()->guild_id;
+
+            // Add this audio stream to the array of audio streams
+            $audioStreams[$guildID] = $vc;
+
+            // Set the bitrate to 128Kbit
+            $vc->setBitrate(128);
+
+            $tickQueue = function() use (&$tickQueue, &$vc, &$message, &$channel, &$curl, &$log, &$audioStreams, $guildID) {
+                // Get the song we'll be playing this round
+                $data = $this->getSong($curl, $log);
+                $song = $data["songData"];
+                $songFile = $data["songFile"];
+
+                $message->getChannelAttribute()->sendMessage("Now playing **{$song->title}** by **{$song->artist}** in {$channel->name}");
+                $vc->playFile($songFile)->done(function() use (&$tickQueue, &$log, &$audioStreams, $guildID) {
+                    if(isset($audioStreams[$guildID])) {
+                        $log->addInfo("Going to next song..");
+                        $tickQueue();
+                    }
+                });
+            };
+
+            if(isset($audioStreams[$guildID]))
+                $tickQueue();
+        });
+    }
+
+    private function getSong(cURL $curl, Logger $log)
     {
         retry:
         // Get a random song from the 90sbutton playlist
@@ -34,7 +65,7 @@ class unleashthe90s
 
         try {
             $log->addNotice("Downloading {$song->title} by {$song->artist}");
-            $video = $dl->download("https://www.youtube.com/watch?v={$song->youtubeid}");
+            $dl->download("https://www.youtube.com/watch?v={$song->youtubeid}");
         } catch (NotFoundException $e) {
             $log->addError("Error: the song was not found: {$e->getMessage()}");
             goto retry;
@@ -49,22 +80,9 @@ class unleashthe90s
             goto retry;
         }
 
-        $webSocket->joinVoiceChannel($channel)->then(function (VoiceClient $vc) use ($message, $discord, $webSocket, $log, &$audioStreams, $channel, $curl, $songFile, $song) {
-            $guildID = $message->getChannelAttribute()->guild_id;
-
-            if(file_exists($songFile)) {
-                // Add this audio stream to the array of audio streams
-                $audioStreams[$guildID] = $vc;
-                $vc->setFrameSize(20)->then(function () use ($vc, &$audioStreams, $guildID, $songFile, $log, $message, $song, $channel) {
-                    $vc->setBitrate(128);
-                    $message->reply("Now playing **{$song->title}** by **{$song->artist}** in {$channel->name}");
-                    $vc->playFile($songFile, 2)->done(function() use ($vc, &$audioStreams, $guildID) {
-                        unset($audioStreams[$guildID]);
-                        $vc->close();
-                    });
-                });
-
-            }
-        });
+        if (file_exists($songFile))
+            return array("songFile" => $songFile, "songData" => $song);
+        else
+            goto retry;
     }
 }

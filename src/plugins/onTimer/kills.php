@@ -83,49 +83,55 @@ class kills extends \Threaded implements \Collectable {
 
             if(!empty($killData)) {
                 foreach ($killData as $kill) {
-                    if ($kill->killID) { // > $latest) {
+                    if (isset($kill->killID) && ($kill->killID > $latest)) {
                         switch ($type) {
                             case "character":
                                 if ($kill->victim->characterID == $id) {
                                     $msg = "{$kill->victim->characterName} ({$kill->victim->corporationName} / {$kill->victim->allianceName}) lost {$kill->victim->shipTypeName} in {$kill->solarSystemName} ({$kill->regionName}) with a total value of {$kill->totalValue}isk | https://beta.eve-kill.net/kill/{$kill->killID}/";
+                                    $this->db->execute("UPDATE killmailPosting SET latestKillID = :killID WHERE id = :rowID", array(":killID" => $kill->killID, ":rowID" => $rowID));
                                 }
 
                                 foreach ($kill->attackers as $attacker) {
                                     if ($attacker->characterID == $id && $attacker->finalBlow == 1) {
                                         $msg = "{$attacker->characterName} participated in killing {$kill->victim->characterName} ({$kill->victim->corporationName} / {$kill->victim->allianceName} / {$kill->victim->shipTypeName}) in a {$attacker->shipTypeName} doing a total of {$attacker->damageDone} damage, and helped destroy {$kill->totalValue}isk | https://beta.eve-kill.net/kill/{$kill->killID}/";
+                                        $this->db->execute("UPDATE killmailPosting SET latestKillID = :killID WHERE id = :rowID", array(":killID" => $kill->killID, ":rowID" => $rowID));
                                     }
                                 }
                                 break;
                             case "corporation":
                                 if ($kill->victim->corporationID == $id) {
                                     $msg = "{$kill->victim->characterName} ({$kill->victim->corporationName} / {$kill->victim->allianceName}) lost {$kill->victim->shipTypeName} in {$kill->solarSystemName} ({$kill->regionName}) with a total value of {$kill->totalValue}isk";
+                                    $this->db->execute("UPDATE killmailPosting SET latestKillID = :killID WHERE id = :rowID", array(":killID" => $kill->killID, ":rowID" => $rowID));
                                 }
 
                                 foreach ($kill->attackers as $attacker) {
                                     if ($attacker->corporationID == $id && $attacker->finalBlow == 1) {
                                         $msg = "{$attacker->characterName} participated in killing {$kill->victim->characterName} ({$kill->victim->corporationName} / {$kill->victim->allianceName} / {$kill->victim->shipTypeName}) in a {$attacker->shipTypeName} doing a total of {$attacker->damageDone} damage, and helped destroy {$kill->totalValue}isk | https://beta.eve-kill.net/kill/{$kill->killID}/";
+                                        $this->db->execute("UPDATE killmailPosting SET latestKillID = :killID WHERE id = :rowID", array(":killID" => $kill->killID, ":rowID" => $rowID));
                                     }
                                 }
                                 break;
                             case "alliance":
                                 if ($kill->victim->allianceID == $id) {
                                     $msg = "{$kill->victim->characterName} ({$kill->victim->corporationName} / {$kill->victim->allianceName}) lost {$kill->victim->shipTypeName} in {$kill->solarSystemName} ({$kill->regionName}) with a total value of {$kill->totalValue}isk";
+                                    $this->db->execute("UPDATE killmailPosting SET latestKillID = :killID WHERE id = :rowID", array(":killID" => $kill->killID, ":rowID" => $rowID));
                                 }
 
                                 foreach ($kill->attackers as $attacker) {
                                     if ($attacker->allianceID == $id && $attacker->finalBlow == 1) {
                                         $msg = "{$attacker->characterName} participated in killing {$kill->victim->characterName} ({$kill->victim->corporationName} / {$kill->victim->allianceName} / {$kill->victim->shipTypeName}) in a {$attacker->shipTypeName} doing a total of {$attacker->damageDone} damage, and helped destroy {$kill->totalValue}isk | https://beta.eve-kill.net/kill/{$kill->killID}/";
+                                        $this->db->execute("UPDATE killmailPosting SET latestKillID = :killID WHERE id = :rowID", array(":killID" => $kill->killID, ":rowID" => $rowID));
                                     }
                                 }
                                 break;
                         }
                     }
-                    $this->db->execute("UPDATE killmailPosting SET latestKillID = :killID WHERE id = :rowID", array(":killID" => $kill->killID, ":rowID" => $rowID));
                 }
 
                 if(!empty($msg)) {
-                    $channel = Channel::find($channelID);
-                    $channel->sendMessage($msg);
+                    /** @var Channel $chan */
+                    $chan = Channel::find($channelID);
+                    $chan->sendMessage($msg);
                 }
             }
         }

@@ -99,7 +99,7 @@ class time extends \Threaded implements \Collectable
         $msk = $msk->format("H:i:s");
         $aest = $dateTime->setTimezone(new DateTimeZone("Australia/Sydney"));
         $aest = $aest->format("H:i:s");
-        $msg = "**Current EVE Time:** {$utc} / **EVE Date:** {$date} / **PT:** {$pt} / **ET:** {$et} / **CET:** {$cet} / **MSK:** {$msk} / **AEST:** {$aest}";
+        $msg = "**Current EVE Time:** {$utc} / **EVE Date:** {$date} / **Los Angeles (PT):** {$pt} / **New York (ET):** {$et} / **Berlin/Copenhagen (CET):** {$cet} / **Moscow (MSK):** {$msk} / **Sydney (AEST):** {$aest}";
         $this->message->reply($msg);
 
         // Mark this as garbage

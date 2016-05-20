@@ -120,7 +120,6 @@ class config extends \Threaded implements \Collectable
                 $typeName = trim($input[2]);
                 $typeID = trim($input[3]);
 
-                echo $typeID;
                 switch ($typeName) {
                     case "character":
                         // Check said char exists on the killboard..
