@@ -25,7 +25,8 @@ class radio90s
             $audioStreams[$guildID] = $vc;
 
             // Set the bitrate to 128Kbit
-            $vc->setBitrate(128);
+            $vc->setBitrate(128000);
+            $vc->setFrameSize(40);
 
             $tickQueue = function() use (&$tickQueue, &$vc, &$message, &$channel, &$curl, &$log, &$audioStreams, $guildID) {
                 // Get the song we'll be playing this round
@@ -33,10 +34,13 @@ class radio90s
                 $song = $data["songData"];
                 $songFile = $data["songFile"];
 
-                $message->getChannelAttribute()->sendMessage("Now playing **{$song->title}** by **{$song->artist}** in {$channel->name}");
-                $vc->playFile($songFile)->done(function() use (&$tickQueue, &$log, &$audioStreams, $guildID) {
+                // Do we really want it to spam the origin channel with what song we're playing all the time?
+                //$message->getChannelAttribute()->sendMessage("Now playing **{$song->title}** by **{$song->artist}** in {$channel->name}");
+                $log->addInfo("Now playing **{$song->title}** by **{$song->artist}** in {$channel->name}");
+                $vc->playFile($songFile)->done(function() use (&$tickQueue, $vc, &$log, &$audioStreams, $guildID) {
                     if(isset($audioStreams[$guildID])) {
                         $log->addInfo("Going to next song..");
+                        $vc->stop();
                         $tickQueue();
                     }
                 });

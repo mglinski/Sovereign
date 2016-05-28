@@ -91,7 +91,8 @@ class cleverBotMessage extends \Threaded implements \Collectable
 
         $cleverBotNick = $this->db->queryField("SELECT nick FROM cleverbot WHERE serverID = :serverID", "nick", array(":serverID" => $guildID));
 
-        $msg = str_replace("<@{$this->discord->getClient()->id}>", $this->discord->getClient()->username, $this->message->content);
+        // Simply remove the <id> part of the string, since it seems to make the responses from Cleverbot be less idiotic and terrible..
+        $msg = str_replace("<@{$this->discord->getClient()->id}>", "", $this->message->content);
         $response = $this->curl->post("https://cleverbot.io/1.0/ask", array("user" => $this->config->get("user", "cleverbot"), "key" => $this->config->get("key", "cleverbot"), "nick" => $cleverBotNick, "text" => $msg));
 
         if ($response) {

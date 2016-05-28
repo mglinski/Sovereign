@@ -18,8 +18,8 @@ class reapers
             $guildID = $message->getChannelAttribute()->guild_id;
             // Add this audio stream to the array of audio streams
             $audioStreams[$guildID] = $vc;
-            $vc->setFrameSize(20)->then(function () use ($vc, &$audioStreams, $guildID) {
-                $vc->setBitrate(128);
+            $vc->setFrameSize(40)->then(function () use ($vc, &$audioStreams, $guildID) {
+                $vc->setBitrate(128000);
                 $number = mt_rand(1, 23);
                 $file = __DIR__ . "/../../../sounds/reapers/{$number}.mp3";
                 $vc->playFile($file, 2)->done(function() use ($vc, &$audioStreams, $guildID) {

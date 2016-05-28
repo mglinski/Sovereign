@@ -184,6 +184,12 @@ class porn extends \Threaded implements \Collectable
                 case "food":
                     $urls = array("https://api.imgur.com/3/gallery/r/foodporn/time/all/");
                     break;
+                case "gifrecipes":
+                    $urls = array("https://api.imgur.com/3/gallery/r/gifrecipes/time/all/");
+                    break;
+                case "bbw":
+                    $urls = array("https://api.imgur.com/3/gallery/r/bbw/time/all/");
+                    break;
                 case "cheese":
                 case "dick":
                 case "dong":
@@ -191,7 +197,7 @@ class porn extends \Threaded implements \Collectable
                     $urls = array("https://api.imgur.com/3/gallery/r/penis/time/all/");
                     break;
                 default:
-                    $msg = "No endpoint selected. Currently available are: redheads, blondes, asians, gonewild, realgirls, palegirls, gif, lesbians, tattoos, mgw/militarygonewild, amateur, college, bondage, milf, freckles, boobs, ass, food and cosplay";
+                    $msg = "No endpoint selected. Currently available are: redheads, blondes, asians, gonewild, realgirls, palegirls, gif, lesbians, tattoos, mgw/militarygonewild, amateur, college, bondage, milf, freckles, boobs, ass, dong, bbw, food, gifrecipes and cosplay";
                     $this->message->reply($msg);
                     break;
             }

@@ -63,8 +63,8 @@ class youtube
             if(file_exists($songFile)) {
                 // Add this audio stream to the array of audio streams
                 $audioStreams[$guildID] = $vc;
-                $vc->setFrameSize(20)->then(function () use ($vc, &$audioStreams, $guildID, $songFile, $log, $message, $title, $channel) {
-                    $vc->setBitrate(128);
+                $vc->setFrameSize(40)->then(function () use ($vc, &$audioStreams, $guildID, $songFile, $log, $message, $title, $channel) {
+                    $vc->setBitrate(128000);
                     $message->reply("Now playing **{$title}** in {$channel->name}");
                     $vc->playFile($songFile, 2)->done(function() use ($vc, &$audioStreams, $guildID) {
                         unset($audioStreams[$guildID]);

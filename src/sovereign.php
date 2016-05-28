@@ -222,6 +222,9 @@ class Sovereign
 
                 $this->log->addInfo("Member recount, currently available to: {$this->extras["memberCount"]} people");
             });
+
+            // @todo run a timer to check if there are any active voice sessions - and if there are, if there are any people in those voice sessions
+            // If not, stop the session and leave the channel (To save some bandwidth)
         });
 
         $this->websocket->on("error", function ($error, $websocket) {
@@ -384,6 +387,14 @@ class Sovereign
                 if ($nick)
                     $this->db->execute("INSERT INTO cleverbot (serverID, nick) VALUES (:serverID, :nick) ON DUPLICATE KEY UPDATE nick = :nick", [":serverID" => $serverID, ":nick" => $nick]);
             }
+
+            // Send a hello message to the channel (Only if it's new!)
+            //$message = "Hello, i was invited here by someone with admin permissions, i have quite a few features that you can discover by doing %help\n";
+            //$message .= "I am sorry if i am triggering other bots aswell, you can change my trigger with %config setTrigger newTrigger (Example: %config setTrigger *)\n";
+            //$message .= "If you for some reason don't want me here afterall, just kick me ;)";
+            // Get the first channel in the list (usually the default channel)
+            //$channel = $guild->channels->first();
+            //$channel->sendMessage($message);
         });
 
         // Run the websocket, and in turn, the bot!
