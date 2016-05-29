@@ -50,8 +50,123 @@ class radio
             case "eurodance":
                 $url = "http://streaming.radionomy.com/Eurodance-90";
                 break;
+            case "djdeant":
+                $url = "http://anycast.dj-deant.com/?icy=http";
+                break;
+            case "amsterdamtranceradio":
+                $url = "http://185.33.21.112:11029/;?icy=http";
+                break;
+            case "psyradio":
+                $url = "http://81.88.36.44:8030/;?icy=http";
+                break;
+            case "classical":
+                $url = "http://109.123.116.202:8020/stream?icy=http";
+                break;
+            case "classicrock":
+                $url = "http://185.33.22.15:11093/;?icy=http";
+                break;
+            case "groovesalad":
+                $url = "http://ice1.somafm.com/groovesalad-128-mp3";
+                break;
+            case "dronezone":
+                $url = "http://ice1.somafm.com/dronezone-128-mp3";
+                break;
+            case "indiepoprocks":
+                $url = "http://ice1.somafm.com/indiepop-128-mp3";
+                break;
+            case "spacestationsoma":
+                $url = "http://ice1.somafm.com/spacestation-128-mp3";
+                break;
+            case "secretagent":
+                $url = "http://ice1.somafm.com/secretagent-128-mp3";
+                break;
+            case "lush":
+                $url = "http://ice1.somafm.com/lush-128-mp3";
+                break;
+            case "underground80s":
+                $url = "http://ice1.somafm.com/u80s-128-mp3";
+                break;
+            case "deepspaceone":
+                $url = "http://ice1.somafm.com/deepspaceone-128-mp3";
+                break;
+            case "leftcoast70s":
+                $url = "http://ice1.somafm.com/seventies-128-mp3";
+                break;
+            case "bootliquor":
+                $url = "http://ice1.somafm.com/bootliquor-128-mp3";
+                break;
+            case "thetrip":
+                $url = "http://ice1.somafm.com/thetrip-128-mp3";
+                break;
+            case "suburbsofgoa":
+                $url = "http://ice1.somafm.com/suburbsofgoa-128-mp3";
+                break;
+            case "bagelradio":
+                $url = "http://ice1.somafm.com/bagel-128-mp3";
+                break;
+            case "beatblender":
+                $url = "http://ice1.somafm.com/beatblender-128-mp3";
+                break;
+            case "defconradio":
+                $url = "http://ice1.somafm.com/defcon-128-mp3";
+                break;
+            case "sonicuniverse":
+                $url = "http://ice1.somafm.com/sonicuniverse-128-mp3";
+                break;
+            case "folkforward":
+                $url = "http://ice1.somafm.com/folkfwd-128-mp3";
+                break;
+            case "poptron":
+                $url = "http://ice1.somafm.com/poptron-128-mp3";
+                break;
+            case "illinoisstreetlounge":
+                $url = "http://ice1.somafm.com/illstreet-128-mp3";
+                break;
+            case "fluid":
+                $url = "http://ice1.somafm.com/fluid-128-mp3";
+                break;
+            case "thistleradio":
+                $url = "http://ice1.somafm.com/thistle-128-mp3";
+                break;
+            case "seveninchsoul":
+                $url = "http://ice1.somafm.com/7soul-128-mp3";
+                break;
+            case "digitalis":
+                $url = "http://ice1.somafm.com/digitalis-128-mp3";
+                break;
+            case "cliqhopidm":
+                $url = "http://ice1.somafm.com/cliqhop-128-mp3";
+                break;
+            case "missioncontrol":
+                $url = "http://ice1.somafm.com/missioncontrol-128-mp3";
+                break;
+            case "dubstepbeyond":
+                $url = "http://ice1.somafm.com/dubstep-128-mp3";
+                break;
+            case "covers":
+                $url = "http://ice1.somafm.com/covers-128-mp3";
+                break;
+            case "thesilentchannel":
+                $url = "http://ice1.somafm.com/silent-128-mp3";
+                break;
+            case "blackrockfm":
+                $url = "http://ice1.somafm.com/brfm-128-mp3";
+                break;
+            case "doomed":
+                $url = "http://ice1.somafm.com/doomed-128-mp3";
+                break;
+            case "sf1033":
+                $url = "http://ice1.somafm.com/sf1033-128-mp3";
+                break;
+            case "earwaves":
+                $url = "http://ice1.somafm.com/earwaves-128-mp3";
+                break;
+            case "metaldetector":
+                $url = "http://ice1.somafm.com/metal-128-mp3";
+                break;
+
             default:
-                $message->reply("You can listen to the following radios: EVERadio, NoiseFM, RadioBeats, VIVAFM, Dance, ANRDK, TheVoiceDK, EuroDance and Schlager..");
+                $message->reply("You can listen to the following radios: EVERadio, NoiseFM, RadioBeats, VIVAFM, Dance, ANRDK, TheVoiceDK, EuroDance, DJDeanT, AmsterdamTranceRadio, PsyRadio, Classical, ClassicRock, GrooveSalad, DroneZone, IndiePopRocks, SpaceStationSoma, SecretAgent, Lush, Underground80s, DeepSpaceOne, LeftCoast70s, BootLiquor, TheTrip, SuburbsOfGoa, BagelRadio, BeatBlender, DefConRadio, SonicUniverse, FolkForward, PopTron, IllinoisStreetLounge, Fluid, ThistleRadio, SevenInchSoul, Digitalis, CliqhopIDM, MissionControl, DubStepBeyond, Covers, TheSilentChannel, BlackRockFM, Doomed, SF1033, Earwaves, MetalDetector and Schlager..");
                 return;
                 break;
         }
@@ -75,6 +190,7 @@ class radio
                     '-loglevel', 0,
                     '-ar', 48000,
                     '-ac', 2,
+                    '-tune', 'zerolatency',
                     'pipe:1',
                 ];
 
