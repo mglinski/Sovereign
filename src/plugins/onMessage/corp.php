@@ -83,7 +83,8 @@ class corp extends \Threaded implements \Collectable
     public function run()
     {
         $explode = explode(" ", $this->message->content);
-        $name = isset($explode[1]) ? $explode[1] : "";
+        unset($explode[0]);
+        $name = implode(" ", $explode);
 
         $url = "https://evedata.xyz/api/search/corporation/" . urlencode($name) . "/";
         $data = @json_decode($this->curl->get($url), true)["corporation"];
