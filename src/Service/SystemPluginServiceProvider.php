@@ -79,7 +79,7 @@ class SystemPluginServiceProvider extends AbstractServiceProvider implements Boo
         $app->addPlugin('onVoice', 'yt', "\\Sovereign\\Plugins\\onVoice\\youtube", 1, 'Plays whatever is linked in the youtube link', '<youtubeLink>', null);
 
         // Attempt to register any configured service providers
-        $config = $this->getContainer()->get('serverConfig');
+        $config = $this->getContainer()->get('config');
         $providers = $config->get('serviceProviders');
         if (!empty($providers)) {
             foreach ($providers as $class) {
