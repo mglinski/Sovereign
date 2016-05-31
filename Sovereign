@@ -2,78 +2,80 @@
 <?php
 
 // Use all the memory
-ini_set("memory_limit", "-1");
+ini_set('memory_limit', '-1');
 gc_enable();
 error_reporting(1);
 error_reporting(E_ALL);
-define("DISCORDPHP_STARTTIME", microtime(true));
-define("BASEDIR", __DIR__);
+define('DISCORDPHP_STARTTIME', microtime(true));
+define('BASEDIR', __DIR__);
 
 // Load the autoloader
-require_once(__DIR__ . "/vendor/autoload.php");
+require_once(__DIR__ . '/vendor/autoload.php');
 
 // Load the config
-require_once(__DIR__ . "/config/config.php");
+require_once(__DIR__ . '/config/config.php');
 
 // Load the dependencies
-$container = require_once(__DIR__ . "/config/dependencies.php");
+$container = require_once(__DIR__ . '/config/dependencies.php');
 
 // Init the bot
-$container["log"]->addInfo("Sovereign is starting up..");
+$container['log']->addInfo('Sovereign is starting up..');
 
 // Launch the bot
 try {
     $bot = new \Sovereign\Sovereign($container);
 } catch (\Exception $e) {
-    $container["log"]->addError("An error occured: " . $e->getMessage());
+    $container['log']->addError('An error occurred: ' . $e->getMessage());
     die();
 }
 
 // onMessage plugins
-$bot->addPlugin("onMessage", "about", "\\Sovereign\\Plugins\\onMessage\\about", 1, "Shows information about the bot and it's creator", "", null);
-$bot->addPlugin("onMessage", "auth", "\\Sovereign\\Plugins\\onMessage\\auth", 1, "Authenticates you against a login with certain restrictions", "<authCode>", null);
-$bot->addPlugin("onMessage", "char", "\\Sovereign\\Plugins\\onMessage\\char", 1, "Fetches data from EVE-KILL about a character", "<characterName>", null);
-$bot->addPlugin("onMessage", "coinflip", "\\Sovereign\\Plugins\\onMessage\\coinflip", 1, "Flips a coin, and gives you the results", "", null);
-$bot->addPlugin("onMessage", "config", "\\Sovereign\\Plugins\\onMessage\\config", 1, "Lets you configure parts of the bot, but only if you're admin", "", null);
-$bot->addPlugin("onMessage", "corp", "\\Sovereign\\Plugins\\onMessage\\corp", 1, "Fetches data from EVE-KILL about a corporation", "<corporationName>", null);
-$bot->addPlugin("onMessage", "eightball", "\\Sovereign\\Plugins\\onMessage\\eightball", 1, "Shakes the eight ball, and gives you a reply", "", null);
-$bot->addPlugin("onMessage", "eb", "\\Sovereign\\Plugins\\onMessage\\eightball", 1, "Shakes the eight ball, and gives you a reply", "", null);
-$bot->addPlugin("onMessage", "guilds", "\\Sovereign\\Plugins\\onMessage\\guilds", 1, "Tells you what guilds (Server) the bot is on", "", null);
-$bot->addPlugin("onMessage", "item", "\\Sovereign\\Plugins\\onMessage\\item", 1, "Shows you all the information available in the database, for an item", "<itemName>", null);
-$bot->addPlugin("onMessage", "join", "\\Sovereign\\Plugins\\onMessage\\join", 1, "Tells you the oauth invite link", "", null);
-$bot->addPlugin("onMessage", "meme", "\\Sovereign\\Plugins\\onMessage\\meme", 1, "Dank memes!", "", null);
-$bot->addPlugin("onMessage", "pc", "\\Sovereign\\Plugins\\onMessage\\pc", 1, "Lets you check prices of items in EVE. (Global)", "<itemName>", null);
-$bot->addPlugin("onMessage", "amarr", "\\Sovereign\\Plugins\\onMessage\\pc", 1, "Lets you check prices of items in EVE. (Amarr)", "<itemName>", null);
-$bot->addPlugin("onMessage", "jita", "\\Sovereign\\Plugins\\onMessage\\pc", 1, "Lets you check prices of items in EVE. (Jita)", "<itemName>", null);
-$bot->addPlugin("onMessage", "dodixie", "\\Sovereign\\Plugins\\onMessage\\pc", 1, "Lets you check prices of items in EVE. (Dodixie)", "<itemName>", null);
-$bot->addPlugin("onMessage", "hek", "\\Sovereign\\Plugins\\onMessage\\pc", 1, "Lets you check prices of items in EVE. (Hek)", "<itemName>", null);
-$bot->addPlugin("onMessage", "rens", "\\Sovereign\\Plugins\\onMessage\\pc", 1, "Lets you check prices of items in EVE. (Rens)", "<itemName>", null);
-$bot->addPlugin("onMessage", "porn", "\\Sovereign\\Plugins\\onMessage\\porn", 1, "Returns a picture/gif from one of many Imgur categories", "<category>", null);
-$bot->addPlugin("onMessage", "time", "\\Sovereign\\Plugins\\onMessage\\time", 1, "Tells you the current EVE Time and time in various other timezones", "", null);
-$bot->addPlugin("onMessage", "tq", "\\Sovereign\\Plugins\\onMessage\\tq", 1, "Tells you the current status of Tranquility", "", null);
-$bot->addPlugin("onMessage", "user", "\\Sovereign\\Plugins\\onMessage\\user", 1, "Tells you discord information on a user. Including when the bot last saw them, saw them speak, and what they were last playing", "<discordName>", null);
-$bot->addPlugin("onMessage", "wolf", "\\Sovereign\\Plugins\\onMessage\\wolf", 1, "Asks wolframAlpha a question, and returns the result", "<question>", null);
-$bot->addPlugin("onMessage", "help", "\\Sovereign\\Plugins\\onMessage\\help", 1, "Shows helpful information about all the plugins available", null, null);
-$bot->addPlugin("onMessage", "memory", "\\Sovereign\\Plugins\\onMessage\\memory", 3, "Triggers garbage collection", null, null);
+$bot->addPlugin('onMessage', 'about', "\\Sovereign\\Plugins\\onMessage\\about", 1, "Shows information about the bot and it's creator", '', null);
+$bot->addPlugin('onMessage', 'auth', "\\Sovereign\\Plugins\\onMessage\\auth", 1, 'Authenticates you against a login with certain restrictions', '<authCode>', null);
+$bot->addPlugin('onMessage', 'char', "\\Sovereign\\Plugins\\onMessage\\char", 1, 'Fetches data from EVE-KILL about a character', '<characterName>', null);
+$bot->addPlugin('onMessage', 'coinflip', "\\Sovereign\\Plugins\\onMessage\\coinflip", 1, 'Flips a coin, and gives you the results', '', null);
+$bot->addPlugin('onMessage', 'config', "\\Sovereign\\Plugins\\onMessage\\config", 1, "Lets you configure parts of the bot, but only if you're admin", '', null);
+$bot->addPlugin('onMessage', 'corp', "\\Sovereign\\Plugins\\onMessage\\corp", 1, 'Fetches data from EVE-KILL about a corporation', '<corporationName>', null);
+$bot->addPlugin('onMessage', 'eightball', "\\Sovereign\\Plugins\\onMessage\\eightball", 1, 'Shakes the eight ball, and gives you a reply', '', null);
+$bot->addPlugin('onMessage', 'eb', "\\Sovereign\\Plugins\\onMessage\\eightball", 1, 'Shakes the eight ball, and gives you a reply', '', null);
+$bot->addPlugin('onMessage', 'guilds', "\\Sovereign\\Plugins\\onMessage\\guilds", 1, 'Tells you what guilds (Server) the bot is on', '', null);
+$bot->addPlugin('onMessage', 'item', "\\Sovereign\\Plugins\\onMessage\\item", 1, 'Shows you all the information available in the database, for an item', '<itemName>', null);
+$bot->addPlugin('onMessage', 'join', "\\Sovereign\\Plugins\\onMessage\\join", 1, 'Tells you the oauth invite link', '', null);
+$bot->addPlugin('onMessage', 'meme', "\\Sovereign\\Plugins\\onMessage\\meme", 1, 'Dank memes!', '', null);
+$bot->addPlugin('onMessage', 'pc', "\\Sovereign\\Plugins\\onMessage\\pc", 1, 'Lets you check prices of items in EVE. (Global)', '<itemName>', null);
+$bot->addPlugin('onMessage', 'amarr', "\\Sovereign\\Plugins\\onMessage\\pc", 1, 'Lets you check prices of items in EVE. (Amarr)', '<itemName>', null);
+$bot->addPlugin('onMessage', 'jita', "\\Sovereign\\Plugins\\onMessage\\pc", 1, 'Lets you check prices of items in EVE. (Jita)', '<itemName>', null);
+$bot->addPlugin('onMessage', 'dodixie', "\\Sovereign\\Plugins\\onMessage\\pc", 1, 'Lets you check prices of items in EVE. (Dodixie)', '<itemName>', null);
+$bot->addPlugin('onMessage', 'hek', "\\Sovereign\\Plugins\\onMessage\\pc", 1, 'Lets you check prices of items in EVE. (Hek)', '<itemName>', null);
+$bot->addPlugin('onMessage', 'rens', "\\Sovereign\\Plugins\\onMessage\\pc", 1, 'Lets you check prices of items in EVE. (Rens)', '<itemName>', null);
+$bot->addPlugin('onMessage', 'porn', "\\Sovereign\\Plugins\\onMessage\\porn", 1, 'Returns a picture/gif from one of many Imgur categories', '<category>', null);
+$bot->addPlugin('onMessage', 'time', "\\Sovereign\\Plugins\\onMessage\\time", 1, 'Tells you the current EVE Time and time in various other timezones', '', null);
+$bot->addPlugin('onMessage', 'tq', "\\Sovereign\\Plugins\\onMessage\\tq", 1, 'Tells you the current status of Tranquility', '', null);
+$bot->addPlugin('onMessage', 'user', "\\Sovereign\\Plugins\\onMessage\\user", 1, 'Tells you discord information on a user. Including when the bot last saw them, saw them speak, and what they were last playing', '<discordName>', null);
+$bot->addPlugin('onMessage', 'wolf', "\\Sovereign\\Plugins\\onMessage\\wolf", 1, 'Asks wolframAlpha a question, and returns the result', '<question>', null);
+$bot->addPlugin('onMessage', 'help', "\\Sovereign\\Plugins\\onMessage\\help", 1, 'Shows helpful information about all the plugins available', null, null);
+$bot->addPlugin('onMessage', 'memory', "\\Sovereign\\Plugins\\onMessage\\memory", 3, 'Triggers garbage collection', null, null);
 
 // onTimer plugins
-$bot->addPlugin("onTimer", "memory", "\\Sovereign\\Plugins\\onTimer\\memory", 1, "", "", 1800);
-$bot->addPlugin("onTimer", "jabberPingsTheCulture", "\\Sovereign\\Plugins\\onTimer\\jabberPingsTheCulture", 1, "", "", 5);
-$bot->addPlugin("onTimer", "kills", "\\Sovereign\\Plugins\\onTimer\\kills", 1, "", "", 15);
+$bot->addPlugin('onTimer', 'memory', "\\Sovereign\\Plugins\\onTimer\\memory", 1, '', '', 1800);
+$bot->addPlugin('onTimer', 'jabberPingsTheCulture', "\\Sovereign\\Plugins\\onTimer\\jabberPingsTheCulture", 1, '', '', 5);
+$bot->addPlugin('onTimer', 'kills', "\\Sovereign\\Plugins\\onTimer\\kills", 1, '', '', 15);
 
 // onVoice plugins
-$bot->addPlugin("onVoice", "reapers", "\\Sovereign\\Plugins\\onVoice\\reapers", 1, "Plays a random quote from Sovereign", "", null);
-$bot->addPlugin("onVoice", "horn", "\\Sovereign\\Plugins\\onVoice\\horn", 1, "Horns. Just horns..", "", null);
-$bot->addPlugin("onVoice", "pause", "\\Sovereign\\Plugins\\onVoice\\pause", 1, "Pauses audio playback", "", null);
-$bot->addPlugin("onVoice", "stop", "\\Sovereign\\Plugins\\onVoice\\stop", 1, "Stops audio playback", "", null);
-$bot->addPlugin("onVoice", "next", "\\Sovereign\\Plugins\\onVoice\\next", 1, "Goes to the next track if radio90s is playing", "", null);
-$bot->addPlugin("onVoice", "unpause", "\\Sovereign\\Plugins\\onVoice\\unpause", 1, "Resumes audio playback", "", null);
-$bot->addPlugin("onVoice", "resume", "\\Sovereign\\Plugins\\onVoice\\unpause", 1, "Resumes audio playback", "", null);
-$bot->addPlugin("onVoice", "warnings", "\\Sovereign\\Plugins\\onVoice\\warnings", 1, "Plays a random warning sound from EVE-Online", "", null);
-$bot->addPlugin("onVoice", "unleashthe90s", "\\Sovereign\\Plugins\\onVoice\\unleashthe90s", 1, "Plays a random 90s song", "", null);
-$bot->addPlugin("onVoice", "radio90s", "\\Sovereign\\Plugins\\onVoice\\radio90s", 1, "Keeps on playing 90s songs, till you go !stop", "", null);
-$bot->addPlugin("onVoice", "radio", "\\Sovereign\\Plugins\\onVoice\\radio", 1, "Keeps on playing a Radio station, till you go !stop", "", null);
-$bot->addPlugin("onVoice", "youtube", "\\Sovereign\\Plugins\\onVoice\\youtube", 1, "Plays whatever is linked in the youtube link", "<youtubeLink>", null);
-$bot->addPlugin("onVoice", "yt", "\\Sovereign\\Plugins\\onVoice\\youtube", 1, "Plays whatever is linked in the youtube link", "<youtubeLink>", null);
+$bot->addPlugin('onVoice', 'reapers', "\\Sovereign\\Plugins\\onVoice\\reapers", 1, 'Plays a random quote from Sovereign', '', null);
+$bot->addPlugin('onVoice', 'horn', "\\Sovereign\\Plugins\\onVoice\\horn", 1, 'Horns. Just horns..', '', null);
+$bot->addPlugin('onVoice', 'pause', "\\Sovereign\\Plugins\\onVoice\\pause", 1, 'Pauses audio playback', '', null);
+$bot->addPlugin('onVoice', 'stop', "\\Sovereign\\Plugins\\onVoice\\stop", 1, 'Stops audio playback', '', null);
+$bot->addPlugin('onVoice', 'next', "\\Sovereign\\Plugins\\onVoice\\next", 1, 'Goes to the next track if radio90s is playing', '', null);
+$bot->addPlugin('onVoice', 'unpause', "\\Sovereign\\Plugins\\onVoice\\unpause", 1, 'Resumes audio playback', '', null);
+$bot->addPlugin('onVoice', 'resume', "\\Sovereign\\Plugins\\onVoice\\unpause", 1, 'Resumes audio playback', '', null);
+$bot->addPlugin('onVoice', 'warnings', "\\Sovereign\\Plugins\\onVoice\\warnings", 1, 'Plays a random warning sound from EVE-Online', '', null);
+$bot->addPlugin('onVoice', 'unleashthe90s', "\\Sovereign\\Plugins\\onVoice\\unleashthe90s", 1, 'Plays a random 90s song', '', null);
+$bot->addPlugin('onVoice', 'radio90s', "\\Sovereign\\Plugins\\onVoice\\radio90s", 1, 'Keeps on playing 90s songs, till you go !stop', '', null);
+$bot->addPlugin('onVoice', 'radio', "\\Sovereign\\Plugins\\onVoice\\radio", 1, 'Keeps on playing a Radio station, till you go !stop', '', null);
+$bot->addPlugin('onVoice', 'youtube', "\\Sovereign\\Plugins\\onVoice\\youtube", 1, 'Plays whatever is linked in the youtube link', '<youtubeLink>', null);
+$bot->addPlugin('onVoice', 'yt', "\\Sovereign\\Plugins\\onVoice\\youtube", 1, 'Plays whatever is linked in the youtube link', '<youtubeLink>', null);
+
+
 // Launch the bot
 $bot->run();
