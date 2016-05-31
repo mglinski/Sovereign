@@ -25,7 +25,6 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/norkunas/youtube-dl-php" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/paragonie/random_compat" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pimple/pimple" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/predis/predis" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/cache" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/http-message" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/log" />
@@ -104,7 +103,6 @@
           <root url="file://$MODULE_DIR$/vendor/norkunas/youtube-dl-php" />
           <root url="file://$MODULE_DIR$/vendor/paragonie/random_compat" />
           <root url="file://$MODULE_DIR$/vendor/pimple/pimple" />
-          <root url="file://$MODULE_DIR$/vendor/predis/predis" />
           <root url="file://$MODULE_DIR$/vendor/psr/cache" />
           <root url="file://$MODULE_DIR$/vendor/psr/http-message" />
           <root url="file://$MODULE_DIR$/vendor/psr/log" />
@@ -167,7 +165,6 @@
           <root url="file://$MODULE_DIR$/vendor/norkunas/youtube-dl-php" />
           <root url="file://$MODULE_DIR$/vendor/paragonie/random_compat" />
           <root url="file://$MODULE_DIR$/vendor/pimple/pimple" />
-          <root url="file://$MODULE_DIR$/vendor/predis/predis" />
           <root url="file://$MODULE_DIR$/vendor/psr/cache" />
           <root url="file://$MODULE_DIR$/vendor/psr/http-message" />
           <root url="file://$MODULE_DIR$/vendor/psr/log" />
