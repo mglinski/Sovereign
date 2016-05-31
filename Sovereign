@@ -20,6 +20,9 @@ $container->delegate(
     new League\Container\ReflectionContainer
 );
 
+// register default config file
+$container->add('configFile', BASEDIR . '/config/config.php');
+
 // Add the default system service provider
 $container->addServiceProvider(\Sovereign\Service\SystemServiceProvider::class);
 
@@ -30,6 +33,8 @@ try {
     // Init the bot
     $container->get('log')->addInfo('Sovereign is starting up..');
     $bot = $container->get('app');
+
+    // Register the default plugins and services, and boot them.
     $container->addServiceProvider(\Sovereign\Service\SystemPluginServiceProvider::class);
 } catch (\Exception $e) {
     $container->get('log')->addError('An error occurred: ' . $e->getMessage());

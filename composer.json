@@ -21,5 +21,6 @@
     "monolog/monolog": "1.19.*",
     "norkunas/youtube-dl-php": "0.2.*",
     "league/container": "^2.2"
-  }
+  },
+  "bin": ["Sovereign"]
 }
