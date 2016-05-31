@@ -274,20 +274,24 @@ class Sovereign
                 foreach ($this->onMessage as $command => $data) {
                     $parts = [];
                     $content = explode(" ", $message->content);
-                    foreach ($content as $index => $c)
-                        foreach (explode("\n", $c) as $p)
+                    foreach ($content as $index => $c) {
+                                            foreach (explode("\n", $c) as $p)
                             $parts[] = $p;
+                    }
 
                     if ($parts[0] == $config->prefix . $command) {
                         // If they are listed under the admins array in the bot config, they're the super admins
-                        if (in_array($message->author->id, $this->globalConfig->get("admins", "permissions")))
-                            $userPerms = 3;
+                        if (in_array($message->author->id, $this->globalConfig->get("admins", "permissions"))) {
+                                                    $userPerms = 3;
+                        }
                         // If they are guild owner, they're automatically getting permission level 2
-                        elseif (isset($message->getChannelAttribute()->getGuildAttribute()->owner_id) && ($message->author->id == $message->getChannelAttribute()->getGuildAttribute()->owner_id))
-                            $userPerms = 2;
+                        elseif (isset($message->getChannelAttribute()->getGuildAttribute()->owner_id) && ($message->author->id == $message->getChannelAttribute()->getGuildAttribute()->owner_id)) {
+                                                    $userPerms = 2;
+                        }
                         // Everyone else are just users
-                        else
-                            $userPerms = 1;
+                        else {
+                                                    $userPerms = 1;
+                        }
 
                         if ($userPerms >= $data["permissions"]) {
                             try {
@@ -328,8 +332,9 @@ class Sovereign
                     $parts = [];
                     $content = explode(" ", $message->content);
                     foreach ($content as $index => $c) {
-                                            foreach (explode("\n", $c) as $p)
-                            $parts[] = $p;
+                                            foreach (explode("\n", $c) as $p) {
+                                                                        $parts[] = $p;
+                                            }
                     }
 
                     if ($parts[0] == $config->prefix . $command) {

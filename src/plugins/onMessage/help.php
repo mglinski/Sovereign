@@ -96,10 +96,11 @@ class help extends \Threaded implements \Collectable
         if (isset($cmd)) {
             foreach ($plugins as $command => $data) {
                 if ($command == $cmd) {
-                    if ($data["usage"])
-                        $this->message->reply("**{$this->channelConfig->prefix}{$command}** _{$data["usage"]}_\r\n {$data["description"]}");
-                    else
-                        $this->message->reply("**{$this->channelConfig->prefix}{$command}** \r\n {$data["description"]}");
+                    if ($data["usage"]) {
+                                            $this->message->reply("**{$this->channelConfig->prefix}{$command}** _{$data["usage"]}_\r\n {$data["description"]}");
+                    } else {
+                                            $this->message->reply("**{$this->channelConfig->prefix}{$command}** \r\n {$data["description"]}");
+                    }
                 }
             }
         } else {
