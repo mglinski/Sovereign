@@ -122,7 +122,7 @@ class porn extends \Threaded implements \Collectable
             );
 
             foreach($categories as $catName => $catURL) {
-                $categoryNames[] = $catName;
+                $categoryNames[] = ucfirst($catName);
                 if(strtolower($type) == strtolower($catName)) {
                     if(is_array($catURL))
                         $url = $catURL[array_rand($catURL)];
@@ -131,14 +131,8 @@ class porn extends \Threaded implements \Collectable
                 }
             }
 
-            if(!$url) {
-                $msg = "No endpoint selected. Currently available are: " . implode(", ", $categoryNames);
-                $this->message->reply($msg);
-            }
-
-            if (!empty($urls)) {
+            if (!empty($url)) {
                 // Select a random url
-                $url = $urls[array_rand($urls)];
                 $clientID = $this->config->get("clientID", "imgur");
                 $headers = array();
                 $headers[] = "Content-type: application/json";
@@ -152,6 +146,9 @@ class porn extends \Threaded implements \Collectable
                     $msg = "**Title:** {$img["title"]} | **Section:** {$img["section"]} | **url:** {$imageURL}";
                     $this->message->reply($msg);
                 }
+            } else {
+                $msg = "No endpoint selected. Currently available are: " . implode(", ", $categoryNames);
+                $this->message->reply($msg);
             }
 
         } else {
