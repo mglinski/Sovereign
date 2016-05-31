@@ -14,8 +14,9 @@ class Permissions {
 
     public function get($userID, $serverID) {
         foreach ($this->config->get("admins", "permissions") as $adminID) {
-                    if ($adminID == $userID)
-                return 2;
+                    if ($adminID == $userID) {
+                                    return 2;
+                    }
         }
 
         return $this->db->queryField("SELECT permission FROM permissions WHERE userID = :userID AND serverID = :serverID", "permission", [":userID" => $userID, ":serverID" => $serverID]);
