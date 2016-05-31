@@ -155,13 +155,13 @@ class Sovereign
     public function run()
     {
         // Reap the threads!
-        $this->websocket->loop->addPeriodicTimer(600, function() {
+        $this->websocket->loop->addPeriodicTimer(600, function () {
             // Only restart the audioStream pool if it's actually empty..
             if (empty($this->voice)) {
                 $this->voice->shutdown();
                 $this->voice = new \Pool(24, \Worker::class);
             }
-                
+
             $this->log->addInfo("Restarting the threading pool, to clear out old threads..");
 
             // Shutdown the pool
@@ -174,7 +174,7 @@ class Sovereign
         });
 
         // Handle the onReady event, and setup some timers and so forth
-        $this->websocket->on("ready", function(Discord $discord) {
+        $this->websocket->on("ready", function (Discord $discord) {
             $this->log->addInfo("Websocket connected..");
 
             // Update our presence status
@@ -190,12 +190,12 @@ class Sovereign
                 $this->extras["onMessagePlugins"] = $this->onMessage;
                 $this->extras["onVoicePlugins"] = $this->onVoice;
             }
-            
+
             $this->log->addInfo("Member count, currently available to: {$this->extras["memberCount"]} people");
 
             // Setup the timers for the timer plugins
             foreach ($this->onTimer as $command => $data) {
-                $this->websocket->loop->addPeriodicTimer($data["timer"], function() use ($data, $discord) {
+                $this->websocket->loop->addPeriodicTimer($data["timer"], function () use ($data, $discord) {
                     try {
                         $plugin = new $data["class"]($discord, $this->log, $this->globalConfig, $this->db, $this->curl, $this->settings, $this->permissions, $this->container["serverConfig"], $this->users, $this->extras);
                         $this->timers->submit($plugin);
@@ -206,7 +206,7 @@ class Sovereign
             }
 
             // Issue periodically member recount
-            $this->websocket->loop->addPeriodicTimer(600, function() {
+            $this->websocket->loop->addPeriodicTimer(600, function () {
                 $this->extras["memberCount"] = 0;
                 $this->extras["guildCount"] = 0;
                 /** @var Guild $guild */
@@ -218,6 +218,7 @@ class Sovereign
                     $this->extras["onVoicePlugins"] = $this->onVoice;
                 }
 
+                $this->log->addInfo("Currently running audio streams: " . count($this->onVoice));
                 $this->log->addInfo("Member recount, currently available to: {$this->extras["memberCount"]} people");
             });
 
@@ -225,36 +226,37 @@ class Sovereign
             // If not, stop the session and leave the channel (To save some bandwidth)
         });
 
-        $this->websocket->on("error", function($error, $websocket) {
+        $this->websocket->on("error", function ($error, $websocket) {
             $this->log->addError("An error occurred on the websocket", [$error->getMessage()]);
+            die(1);
         });
 
-        $this->websocket->on("close", function($opCode, $reason) {
+        $this->websocket->on("close", function ($opCode, $reason) {
             $this->log->addWarning("Websocket got closed", ["code" => $opCode, "reason" => $reason]);
         });
 
-        $this->websocket->on("reconnecting", function() {
+        $this->websocket->on("reconnecting", function () {
             $this->log->addInfo("Websocket is reconnecting..");
         });
 
-        $this->websocket->on("reconnected", function() {
+        $this->websocket->on("reconnected", function () {
             $this->log->addInfo("Websocket was reconnected..");
         });
 
         // Handle incoming message logging
-        $this->websocket->on(Event::MESSAGE_CREATE, function(Message $message, Discord $discord) {
+        $this->websocket->on(Event::MESSAGE_CREATE, function (Message $message, Discord $discord) {
             $this->log->addInfo("Message from {$message->author->username}", [$message->content]);
 
             // Don't update data for ourselves..
             if ($message->author->id != $discord->getClient()->id) {
-                            $this->users->set($message->author->id, $message->author->username, "online", null, date("Y-m-d H:i:s"), date("Y-m-d H:i:s"), $message->content);
+                $this->users->set($message->author->id, $message->author->username, "online", null, date("Y-m-d H:i:s"), date("Y-m-d H:i:s"), $message->content);
             }
 
             // @todo Create text logs
         });
 
         // Handle plugin running
-        $this->websocket->on(Event::MESSAGE_CREATE, function(Message $message, Discord $discord) {
+        $this->websocket->on(Event::MESSAGE_CREATE, function (Message $message, Discord $discord) {
             $guildID = $message->getChannelAttribute()->guild_id;
 
             // Get server config
@@ -263,7 +265,7 @@ class Sovereign
             // Is the person admin?
             $userDiscordID = $message->author->id;
             foreach ($this->globalConfig->get("admins", "permissions") as $admins) {
-                            $message->isAdmin = $admins == $userDiscordID ? true : false;
+                $message->isAdmin = $admins == $userDiscordID ? true : false;
             }
 
             // Define the prefix if it isn't already set..
@@ -313,13 +315,13 @@ class Sovereign
         });
 
         // Handle joining a voice channel, and playing.. stuff....
-        $this->websocket->on(Event::MESSAGE_CREATE, function(Message $message, Discord $discord) {
+        $this->websocket->on(Event::MESSAGE_CREATE, function (Message $message, Discord $discord) {
             // Get the guildID
             $guildID = $message->getChannelAttribute()->guild_id;
-            
+
             // Get this guilds settings
             $config = $this->settings->get($guildID);
-            
+
             // Get the prefix for this guild
             @$config->prefix = isset($config->prefix) ? $config->prefix : $this->globalConfig->get("prefix", "bot");
 
@@ -328,7 +330,7 @@ class Sovereign
                     $parts = [];
                     $content = explode(" ", $message->content);
                     foreach ($content as $index => $c) {
-                                            foreach (explode("\n", $c) as $p)
+                        foreach (explode("\n", $c) as $p)
                             $parts[] = $p;
                     }
 
@@ -351,7 +353,7 @@ class Sovereign
         });
 
         // Handle if it's a message for the bot (CleverBot invocation)
-        $this->websocket->on(Event::MESSAGE_CREATE, function(Message $message, Discord $discord) {
+        $this->websocket->on(Event::MESSAGE_CREATE, function (Message $message, Discord $discord) {
             // If we got highlighted we should probably answer back
             if (stristr($message->content, $discord->getClient()->id)) {
                 try {
@@ -363,7 +365,7 @@ class Sovereign
         });
 
         // Handle presence updates
-        $this->websocket->on(Event::PRESENCE_UPDATE, function(PresenceUpdate $presenceUpdate) {
+        $this->websocket->on(Event::PRESENCE_UPDATE, function (PresenceUpdate $presenceUpdate) {
             if ($presenceUpdate->user->id && $presenceUpdate->user->username) {
                 try {
                     $this->log->addInfo("Updating presence info for {$presenceUpdate->user->username}");
@@ -376,7 +378,7 @@ class Sovereign
         });
 
         // Create a new cleverbot \nick\ for this new guild
-        $this->websocket->on(Event::GUILD_CREATE, function(Guild $guild) {
+        $this->websocket->on(Event::GUILD_CREATE, function (Guild $guild) {
             $this->log->addInfo("Setting up Cleverbot for {$guild->name}");
             $serverID = $guild->id;
             $result = $this->curl->post("https://cleverbot.io/1.0/create", ["user" => $this->globalConfig->get("user", "cleverbot"), "key" => $this->globalConfig->get("key", "cleverbot")]);
@@ -386,7 +388,7 @@ class Sovereign
                 $nick = isset($result->nick) ? $result->nick : false;
 
                 if ($nick) {
-                                    $this->db->execute("INSERT INTO cleverbot (serverID, nick) VALUES (:serverID, :nick) ON DUPLICATE KEY UPDATE nick = :nick", [":serverID" => $serverID, ":nick" => $nick]);
+                    $this->db->execute("INSERT INTO cleverbot (serverID, nick) VALUES (:serverID, :nick) ON DUPLICATE KEY UPDATE nick = :nick", [":serverID" => $serverID, ":nick" => $nick]);
                 }
             }
 

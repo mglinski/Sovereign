@@ -106,13 +106,13 @@ class pc extends \Threaded implements \Collectable
             }
 
             if (count($multiple) == 1) {
-                            $single = $multiple[0];
+                $single = $multiple[0];
             }
 
             if (empty($single) && !empty($multiple)) {
                 $items = array();
                 foreach ($multiple as $item) {
-                                    $items[] = $item["typeName"];
+                    $items[] = $item["typeName"];
                 }
                 $items = implode(", ", $items);
                 return $this->message->reply("**Multiple results found:** {$items}");

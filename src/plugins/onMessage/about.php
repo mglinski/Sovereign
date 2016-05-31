@@ -5,7 +5,6 @@ namespace Sovereign\Plugins\onMessage;
 use DateTime;
 use Discord\Discord;
 use Discord\Parts\Channel\Message;
-use Discord\Parts\Guild\Guild;
 use Monolog\Logger;
 use Sovereign\Lib\Config;
 use Sovereign\Lib\cURL;

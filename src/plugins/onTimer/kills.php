@@ -13,7 +13,8 @@ use Sovereign\Lib\ServerConfig;
 use Sovereign\Lib\Settings;
 use Sovereign\Lib\Users;
 
-class kills extends \Threaded implements \Collectable {
+class kills extends \Threaded implements \Collectable
+{
     /**
      * @var Discord
      */
@@ -55,7 +56,8 @@ class kills extends \Threaded implements \Collectable {
      */
     protected $extras;
 
-    public function __construct($discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $extras) {
+    public function __construct($discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $extras)
+    {
         $this->discord = $discord;
         $this->log = $log;
         $this->config = $config;
@@ -68,7 +70,8 @@ class kills extends \Threaded implements \Collectable {
         $this->extras = $extras;
     }
 
-    public function run() {
+    public function run()
+    {
         $channels = $this->db->query("SELECT * FROM killmailPosting");
 
         foreach ($channels as $channel) {

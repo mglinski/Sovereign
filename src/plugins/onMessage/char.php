@@ -96,7 +96,7 @@ class char extends \Threaded implements \Collectable
         $url = "https://evedata.xyz/api/search/character/" . urlencode($name) . "/";
         $data = @json_decode($this->curl->get($url), true)["character"];
         if (empty($data)) {
-                    return $this->message->reply("**Error:** no results was returned.");
+            return $this->message->reply("**Error:** no results was returned.");
         }
 
         $exists = false;
@@ -110,7 +110,7 @@ class char extends \Threaded implements \Collectable
                 $results[] = $char["characterName"];
             }
             if ($exists == false) {
-                            return $this->message->reply("**Error:** more than one result was returned: " . implode(", ", $results));
+                return $this->message->reply("**Error:** more than one result was returned: " . implode(", ", $results));
             }
         }
 
@@ -119,7 +119,7 @@ class char extends \Threaded implements \Collectable
         $statsURL = "https://beta.eve-kill.net/api/charInfo/characterID/" . urlencode($characterID) . "/";
         $stats = json_decode($this->curl->get($statsURL), true);
         if (empty($stats)) {
-                    return $this->message->reply("**Error:** no data available");
+            return $this->message->reply("**Error:** no data available");
         }
 
         $characterName = @$stats["characterName"];

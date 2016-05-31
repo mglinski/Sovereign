@@ -13,7 +13,8 @@ use Sovereign\Lib\ServerConfig;
 use Sovereign\Lib\Settings;
 use Sovereign\Lib\Users;
 
-class jabberPingsTheCulture extends \Threaded implements \Collectable {
+class jabberPingsTheCulture extends \Threaded implements \Collectable
+{
     /**
      * @var Discord
      */
@@ -54,8 +55,9 @@ class jabberPingsTheCulture extends \Threaded implements \Collectable {
      * @var array
      */
     protected $extras;
-    
-    public function __construct($discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $extras) {
+
+    public function __construct($discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $extras)
+    {
         $this->discord = $discord;
         $this->log = $log;
         $this->config = $config;
@@ -68,7 +70,8 @@ class jabberPingsTheCulture extends \Threaded implements \Collectable {
         $this->extras = $extras;
     }
 
-    public function run() {
+    public function run()
+    {
         $handle = fopen("/tmp/discord.db", "r+");
         flock($handle, LOCK_EX);
 
@@ -77,7 +80,7 @@ class jabberPingsTheCulture extends \Threaded implements \Collectable {
             if (!empty($row)) {
                 $row = str_replace("\n", "", str_replace("\r", "", str_replace("^@", "", $row)));
                 if ($row == "" || $row == " ") {
-                                    continue;
+                    continue;
                 }
 
                 $message .= $row . " | ";

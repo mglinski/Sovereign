@@ -88,7 +88,7 @@ class auth extends \Threaded implements \Collectable
         $authString = isset($explode[1]) ? $explode[1] : "";
 
         if ($this->message->getChannelAttribute()->is_private) {
-                    return $this->message->reply("**Error** You are trying to send your auth token in private. This won't work because i need the guild information, which i can only get if you post it in a public channel on the server you want to get authed on.");
+            return $this->message->reply("**Error** You are trying to send your auth token in private. This won't work because i need the guild information, which i can only get if you post it in a public channel on the server you want to get authed on.");
         }
 
         $authData = $this->db->queryRow("SELECT * FROM authRegs WHERE authString = :authString AND active = 1", array(":authString" => $authString));
@@ -112,7 +112,7 @@ class auth extends \Threaded implements \Collectable
             foreach ($roles as $role) {
                 $roleName = $role->name;
                 if (in_array($roleName, $groups)) {
-                                    $member->addRole($role);
+                    $member->addRole($role);
                 }
             }
 

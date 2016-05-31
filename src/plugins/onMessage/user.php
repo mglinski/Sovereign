@@ -93,7 +93,7 @@ class user extends \Threaded implements \Collectable
                 // Is the person admin?
                 $isAdmin = "no";
                 foreach ($this->config->get("admins", "permissions") as $admins) {
-                                    $isAdmin = $admins == $data["discordID"] ? "yes" : "no";
+                    $isAdmin = $admins == $data["discordID"] ? "yes" : "no";
                 }
 
                 $msg = "```ID: {$data["discordID"]}\nName: {$data["nickName"]}\nAdmin: {$isAdmin}\nLast Seen: {$data["lastSeen"]}\nLast Spoken: {$data["lastSpoke"]}\nLast Status: {$data["lastStatus"]}\nPlayed Last: {$data["game"]}```";

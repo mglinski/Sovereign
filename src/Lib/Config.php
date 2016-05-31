@@ -1,8 +1,10 @@
 <?php
 namespace Sovereign\Lib;
 
-class Config {
-    public function __construct() {
+class Config
+{
+    public function __construct()
+    {
     }
 
     /**
@@ -10,25 +12,27 @@ class Config {
      * @param string $type
      * @param string $default
      */
-    public function get($key, $type = null, $default = null) {
+    public function get($key, $type = null, $default = null)
+    {
         $config = array();
         include(BASEDIR . "/config/config.php");
 
         $type = strtolower($type);
         if (!empty($config[$type][$key])) {
-                    return $config[$type][$key];
+            return $config[$type][$key];
         }
 
         return $default;
     }
 
-    public function getAll($type = null) {
+    public function getAll($type = null)
+    {
         $config = array();
         include(BASEDIR . "/config/config.php");
 
         $type = strtolower($type);
         if (!empty($config[$type])) {
-                    return $config[$type];
+            return $config[$type];
         }
 
         return array();

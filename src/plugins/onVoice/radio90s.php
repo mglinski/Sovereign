@@ -18,7 +18,7 @@ class radio90s
 {
     public function run(Message $message, Discord $discord, WebSocket $webSocket, Logger $log, &$audioStreams, Channel $channel, cURL $curl)
     {
-        $webSocket->joinVoiceChannel($channel)->then(function(VoiceClient $vc) use ($message, $discord, $webSocket, $log, &$audioStreams, $channel, $curl) {
+        $webSocket->joinVoiceChannel($channel)->then(function (VoiceClient $vc) use ($message, $discord, $webSocket, $log, &$audioStreams, $channel, $curl) {
             $guildID = $message->getChannelAttribute()->guild_id;
 
             // Add this audio stream to the array of audio streams
@@ -28,7 +28,7 @@ class radio90s
             $vc->setBitrate(128000);
             $vc->setFrameSize(40);
 
-            $tickQueue = function() use (&$tickQueue, &$vc, &$message, &$channel, &$curl, &$log, &$audioStreams, $guildID) {
+            $tickQueue = function () use (&$tickQueue, &$vc, &$message, &$channel, &$curl, &$log, &$audioStreams, $guildID) {
                 // Get the song we'll be playing this round
                 $data = $this->getSong($curl, $log);
                 $song = $data["songData"];
@@ -37,7 +37,7 @@ class radio90s
                 // Do we really want it to spam the origin channel with what song we're playing all the time?
                 //$message->getChannelAttribute()->sendMessage("Now playing **{$song->title}** by **{$song->artist}** in {$channel->name}");
                 $log->addInfo("Now playing **{$song->title}** by **{$song->artist}** in {$channel->name}");
-                $vc->playFile($songFile)->done(function() use (&$tickQueue, $vc, &$log, &$audioStreams, $guildID) {
+                $vc->playFile($songFile)->done(function () use (&$tickQueue, $vc, &$log, &$audioStreams, $guildID) {
                     if (isset($audioStreams[$guildID])) {
                         $log->addInfo("Going to next song..");
                         $vc->stop();
@@ -47,7 +47,7 @@ class radio90s
             };
 
             if (isset($audioStreams[$guildID])) {
-                            $tickQueue();
+                $tickQueue();
             }
         });
     }
@@ -86,9 +86,9 @@ class radio90s
         }
 
         if (file_exists($songFile)) {
-                    return array("songFile" => $songFile, "songData" => $song);
+            return array("songFile" => $songFile, "songData" => $song);
         } else {
-                    goto retry;
+            goto retry;
         }
     }
 }

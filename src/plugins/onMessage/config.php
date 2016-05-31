@@ -102,7 +102,7 @@ class config extends \Threaded implements \Collectable
             case "enablePorn":
                 $pornArray = $this->serverConfig->getAll($guildID)->porn->allowedChannels;
                 if (!in_array($channelID, $pornArray)) {
-                                    $pornArray[] = $channelID;
+                    $pornArray[] = $channelID;
                 }
 
                 $this->serverConfig->set($guildID, "porn", array("allowedChannels" => $pornArray));
@@ -111,9 +111,9 @@ class config extends \Threaded implements \Collectable
             case "disablePorn":
                 $pornArray = $this->serverConfig->getAll($guildID)->porn->allowedChannels;
                 foreach ($pornArray as $key => $value) {
-                                    if ($value == $channelID) {
-                                                            unset($pornArray[$key]);
-                                    }
+                    if ($value == $channelID) {
+                        unset($pornArray[$key]);
+                    }
                 }
 
                 $this->serverConfig->set($guildID, "porn", array("allowedChannels" => $pornArray));
@@ -201,7 +201,7 @@ class config extends \Threaded implements \Collectable
         }
 
         $this->message->reply($msg);
-        
+
         // Mark this as garbage
         $this->isGarbage();
     }

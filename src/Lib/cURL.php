@@ -4,13 +4,17 @@ namespace Sovereign\Lib;
 
 use Monolog\Logger;
 
-class cURL {
+class cURL
+{
     protected $log;
-    public function __construct(Logger $log) {
+
+    public function __construct(Logger $log)
+    {
         $this->log = $log;
     }
 
-    public function get(String $url, $headers = array()) {
+    public function get(String $url, $headers = array())
+    {
         $headers = array_merge($headers, ["Connection: keep-alive", "Keep-Alive: timeout=10, max=1000"]);
 
         try {
@@ -34,7 +38,8 @@ class cURL {
         }
     }
 
-    public function post(String $url, $parameters = array(), $headers = array()) {
+    public function post(String $url, $parameters = array(), $headers = array())
+    {
         $headers = array_merge($headers, ["Connection: keep-alive", "Keep-Alive: timeout=10, max=1000", "Content-Type: application/x-www-form-urlencoded"]);
 
         try {

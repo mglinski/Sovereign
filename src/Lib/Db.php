@@ -9,24 +9,28 @@ class Db
     protected $log;
     private $pdo;
 
-    public function __sleep() {
+    public function __construct(Config $config, Logger $log)
+    {
+        $this->log = $log;
+        $this->config = $config;
+        $this->pdo = $this->connect();
+    }
+
+    public function __sleep()
+    {
         return array();
     }
 
-    public function __wakeup() {
+    public function __wakeup()
+    {
         $this->log = new \Monolog\Logger("Sovereign");
         $this->log->pushHandler(new \Monolog\Handler\StreamHandler("php://stdout", \Monolog\Logger::INFO));
         $this->config = new Config();
         $this->pdo = $this->connect();
     }
 
-    public function __construct(Config $config, Logger $log) {
-        $this->log = $log;
-        $this->config = $config;
-        $this->pdo = $this->connect();
-    }
-
-    private function connect() {
+    private function connect()
+    {
         $dsn = "mysql:dbname={$this->config->get("dbName", "db")};host={$this->config->get("dbHost", "db")}";
         try {
             $pdo = new \PDO($dsn, $this->config->get("dbUser", "db"), $this->config->get("dbPass", "db"), array(
@@ -44,13 +48,25 @@ class Db
         return $pdo;
     }
 
-    public function query(String $query, $parameters = array()) {
+    public function queryRow(String $query, $parameters = array())
+    {
+        $result = $this->query($query, $parameters);
+
+        if (count($result) >= 1) {
+            return $result[0];
+        }
+
+        return array();
+    }
+
+    public function query(String $query, $parameters = array())
+    {
         try {
             $stmt = $this->pdo->prepare($query);
             $stmt->execute($parameters);
 
             if ($stmt->errorCode() != 0) {
-                            return array();
+                return array();
             }
 
             $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -70,31 +86,23 @@ class Db
         return array();
     }
 
-    public function queryRow(String $query, $parameters = array()) {
-        $result = $this->query($query, $parameters);
-
-        if (count($result) >= 1) {
-                    return $result[0];
-        }
-
-        return array();
-    }
-
     /**
      * @return string
      */
-    public function queryField(String $query, String $field, $parameters = array()) {
+    public function queryField(String $query, String $field, $parameters = array())
+    {
         $result = $this->query($query, $parameters);
 
         if (count($result) == 0) {
-                    return "";
+            return "";
         }
 
         $resultRow = $result[0];
         return $resultRow[$field];
     }
 
-    public function execute(String $query, $parameters = array()) {
+    public function execute(String $query, $parameters = array())
+    {
         try {
             $this->pdo->beginTransaction();
 

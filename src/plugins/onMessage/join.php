@@ -83,7 +83,7 @@ class join extends \Threaded implements \Collectable
     public function run()
     {
         $this->message->reply("Sorry, joining a server does not work - instead use the following link: https://discordapp.com/oauth2/authorize?client_id=176115483513323520&scope=bot&permissions=36703232");
-        
+
         // Mark this as garbage
         $this->isGarbage();
     }

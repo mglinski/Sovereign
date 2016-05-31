@@ -12,7 +12,8 @@ use Sovereign\Lib\ServerConfig;
 use Sovereign\Lib\Settings;
 use Sovereign\Lib\Users;
 
-class memory extends \Threaded implements \Collectable {
+class memory extends \Threaded implements \Collectable
+{
     /**
      * @var Discord
      */
@@ -54,7 +55,8 @@ class memory extends \Threaded implements \Collectable {
      */
     protected $extras;
 
-    public function __construct($discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $extras) {
+    public function __construct($discord, $log, $config, $db, $curl, $settings, $permissions, $serverConfig, $users, $extras)
+    {
         $this->discord = $discord;
         $this->log = $log;
         $this->config = $config;
@@ -67,7 +69,8 @@ class memory extends \Threaded implements \Collectable {
         $this->extras = $extras;
     }
 
-    public function run() {
+    public function run()
+    {
         $this->log->addInfo("Memory in use before garbage collection: " . memory_get_usage() / 1024 / 1024 . "MB");
         gc_collect_cycles();
         $this->log->addInfo("Memory in use after garbage collection: " . memory_get_usage() / 1024 / 1024 . "MB");
