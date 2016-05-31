@@ -12,7 +12,7 @@ use Discord\Parts\WebSockets\PresenceUpdate;
 use Discord\WebSockets\Event;
 use Discord\WebSockets\WebSocket;
 use Monolog\Logger;
-use Pimple\Container;
+use League\Container\Container;
 use Sovereign\Lib\Config as globalConfig;
 use Sovereign\Lib\cURL;
 use Sovereign\Lib\Db;
@@ -107,13 +107,13 @@ class Sovereign
     public function __construct(Container $container)
     {
         $this->container = $container;
-        $this->log = $container['log'];
-        $this->globalConfig = $container['config'];
-        $this->db = $container['db'];
-        $this->curl = $container['curl'];
-        $this->settings = $container['settings'];
-        $this->permissions = $container['permissions'];
-        $this->users = $container['users'];
+        $this->log = $container->get('log');
+        $this->globalConfig = $container->get('config');
+        $this->db = $container->get('db');
+        $this->curl = $container->get('curl');
+        $this->settings = $container->get('settings');
+        $this->permissions = $container->get('permissions');
+        $this->users = $container->get('users');
         $this->extras['startTime'] = time();
         $this->extras['memberCount'] = 0;
         $this->extras['guildCount'] = 0;
@@ -197,7 +197,7 @@ class Sovereign
             foreach ($this->onTimer as $command => $data) {
                 $this->websocket->loop->addPeriodicTimer($data['timer'], function () use ($data, $discord) {
                     try {
-                        $plugin = new $data['class']($discord, $this->log, $this->globalConfig, $this->db, $this->curl, $this->settings, $this->permissions, $this->container['serverConfig'], $this->users, $this->extras);
+                        $plugin = new $data['class']($discord, $this->log, $this->globalConfig, $this->db, $this->curl, $this->settings, $this->permissions, $this->container->get('serverConfig'), $this->users, $this->extras);
                         $this->timers->submit($plugin);
                     } catch (\Exception $e) {
                         $this->log->addError("Error running the periodic timer: {$e->getMessage()}");
@@ -296,11 +296,11 @@ class Sovereign
                                 $message->getChannelAttribute()->broadcastTyping();
                                 if ($data['class'] === "\\Sovereign\\Plugins\\onMessage\\auth") {
                                     /** @var \Threaded $plugin */
-                                    $plugin = new $data['class']($message, $discord, $config, $this->log, $this->globalConfig, $this->db, $this->curl, $this->settings, $this->permissions, $this->container['serverConfig'], $this->users, $this->extras);
+                                    $plugin = new $data['class']($message, $discord, $config, $this->log, $this->globalConfig, $this->db, $this->curl, $this->settings, $this->permissions, $this->container->get('serverConfig'), $this->users, $this->extras);
                                     $plugin->run();
                                 } else {
                                     /** @var \Threaded $plugin */
-                                    $plugin = new $data['class']($message, $discord, $config, $this->log, $this->globalConfig, $this->db, $this->curl, $this->settings, $this->permissions, $this->container['serverConfig'], $this->users, $this->extras);
+                                    $plugin = new $data['class']($message, $discord, $config, $this->log, $this->globalConfig, $this->db, $this->curl, $this->settings, $this->permissions, $this->container->get('serverConfig'), $this->users, $this->extras);
                                     $this->pool->submit($plugin);
                                 }
                                 $this->log->addInfo("{$message->author->username}#{$message->author->discriminator} ({$message->author}) ran command {$config->prefix}{$command}", $content);
@@ -357,7 +357,7 @@ class Sovereign
             // If we got highlighted we should probably answer back
             if (stristr($message->content, $discord->getClient()->id)) {
                 try {
-                    $this->pool->submit(new cleverBotMessage($message, $discord, $this->log, $this->globalConfig, $this->db, $this->curl, $this->settings, $this->permissions, $this->container['serverConfig'], $this->users));
+                    $this->pool->submit(new cleverBotMessage($message, $discord, $this->log, $this->globalConfig, $this->db, $this->curl, $this->settings, $this->permissions, $this->container->get('serverConfig'), $this->users));
                 } catch (\Exception $e) {
                     $message->reply("**Error:** There was an error with CleverBot: {$e->getMessage()}");
                 }
