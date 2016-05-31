@@ -89,6 +89,7 @@ class config extends \Threaded implements \Collectable
 
         // Defaults
         $channelID = $this->message->channel_id;
+        $msg = "";
 
         // Config options
         switch (trim($type)) {
