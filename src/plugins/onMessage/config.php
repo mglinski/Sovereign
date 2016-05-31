@@ -100,7 +100,7 @@ class config extends \Threaded implements \Collectable
                 break;
             case "enablePorn":
                 $pornArray = $this->serverConfig->getAll($guildID)->porn->allowedChannels;
-                if(!in_array($channelID, $pornArray))
+                if (!in_array($channelID, $pornArray))
                     $pornArray[] = $channelID;
 
                 $this->serverConfig->set($guildID, "porn", array("allowedChannels" => $pornArray));

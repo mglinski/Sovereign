@@ -14,7 +14,7 @@ class pause
     public function run(Message $message, Discord $discord, WebSocket $webSocket, Logger $log, &$audioStreams, Channel $channel, cURL $curl)
     {
         $guildID = $channel->guild_id;
-        if(isset($audioStreams[$guildID])) {
+        if (isset($audioStreams[$guildID])) {
             $audioStreams[$guildID]->pause();
             $message->reply("Pausing audio playback..");
         }

@@ -94,8 +94,9 @@ class item extends \Threaded implements \Collectable
 
         if ($data) {
             $msg = "```";
-            foreach ($data as $key => $value)
-                $msg .= $key . ": " . $value . "\n";
+            foreach ($data as $key => $value) {
+                            $msg .= $key . ": " . $value . "\n";
+            }
             $msg .= "```";
 
             $this->message->reply($msg);

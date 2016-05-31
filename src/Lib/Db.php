@@ -49,8 +49,9 @@ class Db
             $stmt = $this->pdo->prepare($query);
             $stmt->execute($parameters);
 
-            if ($stmt->errorCode() != 0)
-                return array();
+            if ($stmt->errorCode() != 0) {
+                            return array();
+            }
 
             $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
@@ -72,16 +73,19 @@ class Db
     public function queryRow(String $query, $parameters = array()) {
         $result = $this->query($query, $parameters);
 
-        if(count($result) >= 1)
+        if (count($result) >= 1)
             return $result[0];
 
         return array();
     }
 
+    /**
+     * @return string
+     */
     public function queryField(String $query, String $field, $parameters = array()) {
         $result = $this->query($query, $parameters);
 
-        if(count($result) == 0)
+        if (count($result) == 0)
             return "";
 
         $resultRow = $result[0];
@@ -95,7 +99,7 @@ class Db
             $stmt = $this->pdo->prepare($query);
             $stmt->execute($parameters);
 
-            if($stmt->errorCode() != 0) {
+            if ($stmt->errorCode() != 0) {
                 $this->pdo->rollBack();
                 return 0;
             }

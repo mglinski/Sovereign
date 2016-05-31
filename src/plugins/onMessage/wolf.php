@@ -101,9 +101,9 @@ class wolf extends \Threaded implements \Collectable
                 $wolfFileName = md5($query);
                 file_put_contents(__DIR__ . "/../../../cache/image/{$wolfFileName}.gif", $image);
                 $this->message->getChannelAttribute()->sendFile(__DIR__ . "/../../../cache/image/{$wolfFileName}.gif", "{$wolfFileName}.gif");
+            } else {
+                            $this->message->reply("Result: {$image}");
             }
-            else
-                $this->message->reply("Result: {$image}");
         } else {
             $this->message->reply("WolframAlpha did not have an answer to your query..");
         }

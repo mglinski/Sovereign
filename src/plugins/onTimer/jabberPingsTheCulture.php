@@ -73,17 +73,18 @@ class jabberPingsTheCulture extends \Threaded implements \Collectable {
         flock($handle, LOCK_EX);
 
         $message = "";
-        while($row = fgets($handle)) {
-            if(!empty($row)) {
+        while ($row = fgets($handle)) {
+            if (!empty($row)) {
                 $row = str_replace("\n", "", str_replace("\r", "", str_replace("^@", "", $row)));
-                if ($row == "" || $row == " ")
-                    continue;
+                if ($row == "" || $row == " ") {
+                                    continue;
+                }
 
                 $message .= $row . " | ";
             }
         }
 
-        if(!empty($message)) {
+        if (!empty($message)) {
             // Strip out the last |
             $message = trim(substr($message, 0, -2));
             $channelID = 154221481625124864;

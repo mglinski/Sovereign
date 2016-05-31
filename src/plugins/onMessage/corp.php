@@ -88,13 +88,15 @@ class corp extends \Threaded implements \Collectable
 
         $url = "https://evedata.xyz/api/search/corporation/" . urlencode($name) . "/";
         $data = @json_decode($this->curl->get($url), true)["corporation"];
-        if (empty($data))
-            return $this->message->reply("**Error:** no results was returned.");
+        if (empty($data)) {
+                    return $this->message->reply("**Error:** no results was returned.");
+        }
 
         if (count($data) > 1) {
             $results = array();
-            foreach ($data as $corp)
-                $results[] = $corp["corporationName"];
+            foreach ($data as $corp) {
+                            $results[] = $corp["corporationName"];
+            }
             return $this->message->reply("**Error:** more than one result was returned: " . implode(", ", $results));
         }
 
@@ -102,8 +104,9 @@ class corp extends \Threaded implements \Collectable
         $corporationID = $data[0]["corporationID"];
         $statsURL = "https://beta.eve-kill.net/api/corpInfo/corporationID/" . urlencode($corporationID) . "/";
         $stats = json_decode($this->curl->get($statsURL), true);
-        if (empty($stats))
-            return $this->message->reply("**Error:** no data available");
+        if (empty($stats)) {
+                    return $this->message->reply("**Error:** no data available");
+        }
 
         $corporationName = @$stats["corporationName"];
         $allianceName = isset($stats["allianceName"]) ? $stats["allianceName"] : "None";

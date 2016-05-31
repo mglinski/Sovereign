@@ -10,14 +10,10 @@ use Discord\Voice\VoiceClient;
 use Discord\WebSockets\WebSocket;
 use Monolog\Logger;
 use Sovereign\Lib\cURL;
-use YoutubeDl\Exception\CopyrightException;
-use YoutubeDl\Exception\NotFoundException;
-use YoutubeDl\Exception\PrivateVideoException;
-use YoutubeDl\YoutubeDl;
 
 class radio
 {
-    public function run(Message $message, Discord $discord, WebSocket &$webSocket, Logger $log, &$audioStreams, Channel $channel, cURL $curl)
+    public function run(Message $message, Discord $discord, WebSocket&$webSocket, Logger $log, &$audioStreams, Channel $channel, cURL $curl)
     {
         $explode = explode(" ", $message->content);
         $type = isset($explode[1]) ? $explode[1] : "";
@@ -200,8 +196,8 @@ class radio
                 break;
         }
 
-        if(!empty($url)) {
-            $webSocket->joinVoiceChannel($channel)->then(function (VoiceClient $vc) use ($message, $discord, &$webSocket, $log, &$audioStreams, $channel, $curl, $url) {
+        if (!empty($url)) {
+            $webSocket->joinVoiceChannel($channel)->then(function(VoiceClient $vc) use ($message, $discord, &$webSocket, $log, &$audioStreams, $channel, $curl, $url) {
                 $guildID = $message->getChannelAttribute()->guild_id;
 
                 // Add this audio stream to the array of audio streams
@@ -226,7 +222,7 @@ class radio
                 $audioStreams["eveRadio"][$guildID] = new Process(implode(" ", $params));
                 $audioStreams["eveRadio"][$guildID]->start($webSocket->loop);
 
-                $vc->playRawStream($audioStreams["eveRadio"][$guildID]->stdout)->done(function () use (&$audioStreams, $vc, $guildID) {
+                $vc->playRawStream($audioStreams["eveRadio"][$guildID]->stdout)->done(function() use (&$audioStreams, $vc, $guildID) {
                     $audioStreams["eveRadio"][$guildID]->close();
                     unset($audioStreams[$guildID]);
                     $vc->close();
