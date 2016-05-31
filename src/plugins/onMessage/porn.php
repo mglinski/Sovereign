@@ -132,7 +132,7 @@ class porn extends \Threaded implements \Collectable
             }
 
             if(!$url) {
-                $msg = "No endpoint selected. Currently available are: redheads, blondes, asians, gonewild, realgirls, palegirls, gif, lesbians, tattoos, mgw/militarygonewild, amateur, college, bondage, milf, freckles, boobs, ass, dong, bbw, food, gifrecipes and cosplay";
+                $msg = "No endpoint selected. Currently available are: " . implode(", ", $categoryNames);
                 $this->message->reply($msg);
             }
 
