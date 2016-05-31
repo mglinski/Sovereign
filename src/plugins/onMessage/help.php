@@ -92,11 +92,11 @@ class help extends \Threaded implements \Collectable
     {
         $explode = explode(" ", $this->message->content);
         $cmd = isset($explode[1]) ? $explode[1] : null;
-        $plugins = (object) array_merge((array) $this->onMessagePlugins, (array) $this->onVoicePlugins);
+        $plugins = (object)array_merge((array)$this->onMessagePlugins, (array)$this->onVoicePlugins);
         if (isset($cmd)) {
             foreach ($plugins as $command => $data) {
                 if ($command == $cmd) {
-                    if($data["usage"])
+                    if ($data["usage"])
                         $this->message->reply("**{$this->channelConfig->prefix}{$command}** _{$data["usage"]}_\r\n {$data["description"]}");
                     else
                         $this->message->reply("**{$this->channelConfig->prefix}{$command}** \r\n {$data["description"]}");
