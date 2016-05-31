@@ -71,7 +71,7 @@ class kills extends \Threaded implements \Collectable {
     public function run() {
         $channels = $this->db->query("SELECT * FROM killmailPosting");
 
-        foreach($channels as $channel) {
+        foreach ($channels as $channel) {
             $rowID = $channel["id"];
             $type = $channel["typeName"];
             $id = $channel["typeID"];
@@ -81,7 +81,7 @@ class kills extends \Threaded implements \Collectable {
             // Get the killdata
             $killData = json_decode($this->curl->get("https://evedata.xyz/api/killlist/latest/"));
 
-            if(!empty($killData)) {
+            if (!empty($killData)) {
                 foreach ($killData as $kill) {
                     if (isset($kill->killID) && ($kill->killID > $latest)) {
                         switch ($type) {
@@ -128,7 +128,7 @@ class kills extends \Threaded implements \Collectable {
                     }
                 }
 
-                if(!empty($msg)) {
+                if (!empty($msg)) {
                     /** @var Channel $chan */
                     $chan = Channel::find($channelID);
                     $chan->sendMessage($msg);

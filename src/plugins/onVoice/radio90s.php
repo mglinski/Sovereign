@@ -18,7 +18,7 @@ class radio90s
 {
     public function run(Message $message, Discord $discord, WebSocket $webSocket, Logger $log, &$audioStreams, Channel $channel, cURL $curl)
     {
-        $webSocket->joinVoiceChannel($channel)->then(function (VoiceClient $vc) use ($message, $discord, $webSocket, $log, &$audioStreams, $channel, $curl) {
+        $webSocket->joinVoiceChannel($channel)->then(function(VoiceClient $vc) use ($message, $discord, $webSocket, $log, &$audioStreams, $channel, $curl) {
             $guildID = $message->getChannelAttribute()->guild_id;
 
             // Add this audio stream to the array of audio streams
@@ -38,7 +38,7 @@ class radio90s
                 //$message->getChannelAttribute()->sendMessage("Now playing **{$song->title}** by **{$song->artist}** in {$channel->name}");
                 $log->addInfo("Now playing **{$song->title}** by **{$song->artist}** in {$channel->name}");
                 $vc->playFile($songFile)->done(function() use (&$tickQueue, $vc, &$log, &$audioStreams, $guildID) {
-                    if(isset($audioStreams[$guildID])) {
+                    if (isset($audioStreams[$guildID])) {
                         $log->addInfo("Going to next song..");
                         $vc->stop();
                         $tickQueue();
@@ -46,7 +46,7 @@ class radio90s
                 });
             };
 
-            if(isset($audioStreams[$guildID]))
+            if (isset($audioStreams[$guildID]))
                 $tickQueue();
         });
     }
@@ -84,9 +84,10 @@ class radio90s
             goto retry;
         }
 
-        if (file_exists($songFile))
-            return array("songFile" => $songFile, "songData" => $song);
-        else
-            goto retry;
+        if (file_exists($songFile)) {
+                    return array("songFile" => $songFile, "songData" => $song);
+        } else {
+                    goto retry;
+        }
     }
 }

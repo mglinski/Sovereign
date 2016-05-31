@@ -16,6 +16,9 @@ class ServerConfig {
         $this->db = $db;
     }
 
+    /**
+     * @param string $key
+     */
     public function get($guildID, $key) {
         $data = json_decode($this->db->queryField("SELECT settings FROM settings WHERE serverID = :serverID", "settings", array(":serverID" => $guildID)));
         return isset($data->{$key}) ? $data->{$key} : null;
@@ -25,6 +28,9 @@ class ServerConfig {
         return json_decode($this->db->queryField("SELECT settings FROM settings WHERE serverID = :serverID", "settings", array(":serverID" => $guildID)));
     }
 
+    /**
+     * @param string $key
+     */
     public function set($guildID, $key, $value) {
         $json = $this->getAll($guildID);
         $json->{$key} = $value;

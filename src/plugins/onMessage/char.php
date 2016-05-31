@@ -88,25 +88,28 @@ class char extends \Threaded implements \Collectable
         $name = implode(" ", $explode);
         $name = stristr($name, "@") ? str_replace("<@", "", str_replace(">", "", $name)) : $name;
 
-        if (is_numeric($name)) // The person used @highlighting, so now we got a discord id, lets map that to a name
+        if (is_numeric($name)) {
+            // The person used @highlighting, so now we got a discord id, lets map that to a name
             $name = $this->db->queryField("SELECT nickName FROM users WHERE discordID = :id", "nickName", array(":id" => $name));
+        }
 
         $url = "https://evedata.xyz/api/search/character/" . urlencode($name) . "/";
         $data = @json_decode($this->curl->get($url), true)["character"];
-        if (empty($data))
-            return $this->message->reply("**Error:** no results was returned.");
+        if (empty($data)) {
+                    return $this->message->reply("**Error:** no results was returned.");
+        }
 
         $exists = false;
         if (count($data) > 1) {
             $results = array();
             foreach ($data as $char) {
-                if(strtolower($char["characterName"]) == strtolower($name)) {
+                if (strtolower($char["characterName"]) == strtolower($name)) {
                     $data[0]["characterID"] = $char["characterID"];
                     $exists = true;
                 }
                 $results[] = $char["characterName"];
             }
-            if($exists == false)
+            if ($exists == false)
                 return $this->message->reply("**Error:** more than one result was returned: " . implode(", ", $results));
         }
 

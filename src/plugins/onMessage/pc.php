@@ -105,13 +105,15 @@ class pc extends \Threaded implements \Collectable
                 $multiple = $this->db->query("SELECT typeID, typeName FROM invTypes WHERE typeName LIKE :item LIMIT 5", array(":item" => $item));
             }
 
-            if (count($multiple) == 1)
-                $single = $multiple[0];
+            if (count($multiple) == 1) {
+                            $single = $multiple[0];
+            }
 
             if (empty($single) && !empty($multiple)) {
                 $items = array();
-                foreach ($multiple as $item)
-                    $items[] = $item["typeName"];
+                foreach ($multiple as $item) {
+                                    $items[] = $item["typeName"];
+                }
                 $items = implode(", ", $items);
                 return $this->message->reply("**Multiple results found:** {$items}");
             }
