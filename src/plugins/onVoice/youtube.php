@@ -24,8 +24,9 @@ class youtube
 
         // URL Checker
         $parts = parse_url($youtubeLink);
-        if (!stristr($parts["host"], "youtube.com"))
-            return $message->reply("Error, you can only use youtube links!");
+        if (!stristr($parts["host"], "youtube.com")) {
+                    return $message->reply("Error, you can only use youtube links!");
+        }
 
         // Generate song md5
         $md5 = md5($youtubeLink);

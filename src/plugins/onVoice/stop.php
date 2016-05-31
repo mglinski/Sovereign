@@ -16,8 +16,9 @@ class stop
         $guildID = $channel->guild_id;
         if (isset($audioStreams[$guildID])) {
             // Kill the EVERadio FFMPEG stream if it's running
-            if (isset($audioStreams["eveRadio"][$guildID]))
-                $audioStreams["eveRadio"][$guildID]->close();
+            if (isset($audioStreams["eveRadio"][$guildID])) {
+                            $audioStreams["eveRadio"][$guildID]->close();
+            }
 
             $audioStreams[$guildID]->stop();
             $audioStreams[$guildID]->close();

@@ -73,8 +73,9 @@ class Db
     public function queryRow(String $query, $parameters = array()) {
         $result = $this->query($query, $parameters);
 
-        if (count($result) >= 1)
-            return $result[0];
+        if (count($result) >= 1) {
+                    return $result[0];
+        }
 
         return array();
     }
@@ -85,8 +86,9 @@ class Db
     public function queryField(String $query, String $field, $parameters = array()) {
         $result = $this->query($query, $parameters);
 
-        if (count($result) == 0)
-            return "";
+        if (count($result) == 0) {
+                    return "";
+        }
 
         $resultRow = $result[0];
         return $resultRow[$field];

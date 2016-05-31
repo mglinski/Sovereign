@@ -46,8 +46,9 @@ class radio90s
                 });
             };
 
-            if (isset($audioStreams[$guildID]))
-                $tickQueue();
+            if (isset($audioStreams[$guildID])) {
+                            $tickQueue();
+            }
         });
     }
 
