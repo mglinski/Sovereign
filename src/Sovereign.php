@@ -124,7 +124,6 @@ class Sovereign
         // Init Discord and Websocket
         $this->log->addInfo("Initializing Discord and Websocket connections..");
         $this->discord = Discord::createWithBotToken($this->globalConfig->get("token", "bot"));
-        //Cache::setCache(new RedisCacheDriver("127.0.0.1", 6379, null, 0));
         Cache::setCache(new ArrayCacheDriver());
         $this->websocket = new WebSocket($this->discord);
     }
