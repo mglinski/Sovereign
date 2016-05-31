@@ -87,119 +87,53 @@ class porn extends \Threaded implements \Collectable
         // This is one of those plugins that need to be allowed before it works
         if (isset($pornConfig->allowedChannels) && in_array($this->message->channel_id, $pornConfig->allowedChannels)) {
             $explode = explode(" ", $this->message->content);
-            $type = isset($explode[1]) ? $explode[1] : "";
-            $urls = [];
-            switch ($type) {
-                case "redheads":
-                case "redhead":
-                case "red":
-                    $urls = array(
-                        "https://api.imgur.com/3/gallery/r/redheads/time/all/",
-                        "https://api.imgur.com/3/gallery/r/ginger/time/all/",
-                        "https://api.imgur.com/3/gallery/r/FireCrotch/time/all/"
-                    );
-                    break;
-                case "blondes":
-                    $urls = array(
-                        "https://api.imgur.com/3/gallery/r/blondes/time/all/"
-                    );
-                    break;
-                case "asians":
-                    $urls = array(
-                        "https://api.imgur.com/3/gallery/r/AsiansGoneWild/time/all/"
-                    );
-                    break;
-                case "gonewild":
-                    $urls = array(
-                        "https://api.imgur.com/3/gallery/r/gonewild/time/all/"
-                    );
-                    break;
-                case "realgirls":
-                    $urls = array(
-                        "https://api.imgur.com/3/gallery/r/realgirls/time/all/"
-                    );
-                    break;
-                case "palegirls":
-                    $urls = array(
-                        "https://api.imgur.com/3/gallery/r/palegirls/time/all/"
-                    );
-                    break;
-                case "gif":
-                    $urls = array(
-                        "https://api.imgur.com/3/gallery/r/NSFW_GIF/time/all/"
-                    );
-                    break;
-                case "lesbians":
-                    $urls = array(
-                        "https://api.imgur.com/3/gallery/r/lesbians/time/all/"
-                    );
-                    break;
-                case "tattoos":
-                    $urls = array(
-                        "https://api.imgur.com/3/gallery/r/Hotchickswithtattoos/time/all/"
-                    );
-                    break;
-                case "mgw":
-                case "militarygonewild":
-                    $urls = array(
-                        "https://api.imgur.com/3/gallery/r/MilitaryGoneWild/time/all/"
-                    );
-                    break;
-                case "amateur":
-                    $urls = array(
-                        "https://api.imgur.com/3/gallery/r/AmateurArchives/time/all/"
-                    );
-                    break;
-                case "college":
-                    $urls = array(
-                        "https://api.imgur.com/3/gallery/r/collegesluts/time/all/"
-                    );
-                    break;
-                case "bondage":
-                    $urls = array(
-                        "https://api.imgur.com/3/gallery/r/bondage/time/all/"
-                    );
-                    break;
-                case "milf":
-                    $urls = array(
-                        "https://api.imgur.com/3/gallery/r/milf/time/all/"
-                    );
-                    break;
-                case "freckles":
-                    $urls = array(
-                        "https://api.imgur.com/3/gallery/r/FreckledGirls/time/all/"
-                    );
-                    break;
-                case "cosplay":
-                    $urls = array("https://api.imgur.com/3/gallery/r/cosplay/time/all/");
-                    break;
-                case "tits":
-                case "breasts":
-                case "boobs":
-                    $urls = array("https://api.imgur.com/3/gallery/r/boobs/time/all/");
-                    break;
-                case "ass":
-                    $urls = array("https://api.imgur.com/3/gallery/r/ass/time/all/");
-                    break;
-                case "food":
-                    $urls = array("https://api.imgur.com/3/gallery/r/foodporn/time/all/");
-                    break;
-                case "gifrecipes":
-                    $urls = array("https://api.imgur.com/3/gallery/r/gifrecipes/time/all/");
-                    break;
-                case "bbw":
-                    $urls = array("https://api.imgur.com/3/gallery/r/bbw/time/all/");
-                    break;
-                case "cheese":
-                case "dick":
-                case "dong":
-                case "penis":
-                    $urls = array("https://api.imgur.com/3/gallery/r/penis/time/all/");
-                    break;
-                default:
-                    $msg = "No endpoint selected. Currently available are: redheads, blondes, asians, gonewild, realgirls, palegirls, gif, lesbians, tattoos, mgw/militarygonewild, amateur, college, bondage, milf, freckles, boobs, ass, dong, bbw, food, gifrecipes and cosplay";
-                    $this->message->reply($msg);
-                    break;
+            unset($explode[0]);
+            $type = implode(" ", $explode);
+            $categoryNames = array();
+            $url = "";
+
+            $categories = array(
+                "redheads" => array(
+                    "https://api.imgur.com/3/gallery/r/redheads/time/all/",
+                    "https://api.imgur.com/3/gallery/r/ginger/time/all/",
+                    "https://api.imgur.com/3/gallery/r/FireCrotch/time/all/"
+                ),
+                "blondes" => "https://api.imgur.com/3/gallery/r/blondes/time/all/",
+                "asians" => "https://api.imgur.com/3/gallery/r/AsiansGoneWild/time/all/",
+                "gonewild" => "https://api.imgur.com/3/gallery/r/gonewild/time/all/",
+                "realgirls" => "https://api.imgur.com/3/gallery/r/realgirls/time/all/",
+                "palegirls" => "https://api.imgur.com/3/gallery/r/palegirls/time/all/",
+                "gif" => "https://api.imgur.com/3/gallery/r/NSFW_GIF/time/all/",
+                "lesbians" => "https://api.imgur.com/3/gallery/r/lesbians/time/all/",
+                "tattiis" => "https://api.imgur.com/3/gallery/r/Hotchickswithtattoos/time/all/",
+                "mgw" => "https://api.imgur.com/3/gallery/r/MilitaryGoneWild/time/all/",
+                "amateur" => "https://api.imgur.com/3/gallery/r/AmateurArchives/time/all/",
+                "college" => "https://api.imgur.com/3/gallery/r/collegesluts/time/all/",
+                "bondage" => "https://api.imgur.com/3/gallery/r/bondage/time/all/",
+                "milf" => "https://api.imgur.com/3/gallery/r/milf/time/all/",
+                "freckles" => "https://api.imgur.com/3/gallery/r/FreckledGirls/time/all/",
+                "cosplay" => "https://api.imgur.com/3/gallery/r/cosplay/time/all/",
+                "tits" => "https://api.imgur.com/3/gallery/r/boobs/time/all/",
+                "ass" => "https://api.imgur.com/3/gallery/r/ass/time/all/",
+                "food" => "https://api.imgur.com/3/gallery/r/foodporn/time/all/",
+                "gifrecipes" => "https://api.imgur.com/3/gallery/r/gifrecipes/time/all/",
+                "bbw" => "https://api.imgur.com/3/gallery/r/bbw/time/all/",
+                "dongs" => "https://api.imgur.com/3/gallery/r/penis/time/all/",
+            );
+
+            foreach($categories as $catName => $catURL) {
+                $categoryNames[] = $catName;
+                if(strtolower($type) == strtolower($catName)) {
+                    if(is_array($catURL))
+                        $url = $catURL[array_rand($catURL)];
+                    else
+                        $url = $catURL;
+                }
+            }
+
+            if(!$url) {
+                $msg = "No endpoint selected. Currently available are: redheads, blondes, asians, gonewild, realgirls, palegirls, gif, lesbians, tattoos, mgw/militarygonewild, amateur, college, bondage, milf, freckles, boobs, ass, dong, bbw, food, gifrecipes and cosplay";
+                $this->message->reply($msg);
             }
 
             if (!empty($urls)) {

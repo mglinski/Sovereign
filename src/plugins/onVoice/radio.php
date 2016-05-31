@@ -19,7 +19,7 @@ class radio
         unset($explode[0]);
         $radioStation = implode(" ", $explode);
 
-        // List of radio stations available.
+        // List of radio stations available.    
         $radios = array(
             "noisefm" => "http://noisefm.ru:8000/play?icy=http",
             "radiobeats" => "http://streaming.shoutcast.com/RadioBeatsFM",

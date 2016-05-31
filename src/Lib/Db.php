@@ -37,6 +37,8 @@ class Db
 
     /**
      * @return array
+     * Upon sleeping (which is needed for pthreads to work with pdo) we just return an empty array, which is the default for all the query functions anyway
+     * It doesn't really matter what we return tho, since once the thread wakes up, the __wakeup function is ran
      */
     public function __sleep()
     {
