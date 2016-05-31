@@ -109,16 +109,18 @@ class char extends \Threaded implements \Collectable
                 }
                 $results[] = $char["characterName"];
             }
-            if ($exists == false)
-                return $this->message->reply("**Error:** more than one result was returned: " . implode(", ", $results));
+            if ($exists == false) {
+                            return $this->message->reply("**Error:** more than one result was returned: " . implode(", ", $results));
+            }
         }
 
         // Get stats
         $characterID = $data[0]["characterID"];
         $statsURL = "https://beta.eve-kill.net/api/charInfo/characterID/" . urlencode($characterID) . "/";
         $stats = json_decode($this->curl->get($statsURL), true);
-        if (empty($stats))
-            return $this->message->reply("**Error:** no data available");
+        if (empty($stats)) {
+                    return $this->message->reply("**Error:** no data available");
+        }
 
         $characterName = @$stats["characterName"];
         $corporationName = @$stats["corporationName"];
