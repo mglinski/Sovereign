@@ -164,9 +164,38 @@ class radio
             case "metaldetector":
                 $url = "http://ice1.somafm.com/metal-128-mp3";
                 break;
-
+            case "90ernedk":
+                $url = "http://194.16.21.232/197_dk_aacp";
+                break;
+            case "novadk":
+                $url = "http://stream.novafm.dk/nova128";
+                break;
+            case "radio100":
+                $url = "http://onair.100fmlive.dk/100fm_live.mp3";
+                break;
+            case "nrjca":
+                $url = "http://8743.live.streamtheworld.com/CKMFFMAAC";
+                break;
+            case "nrjse":
+                $url = "http://194.16.21.227/nrj_se_aacp";
+                break;
+            case "nrjno":
+                $url = "http://stream.p4.no/nrj_mp3_mq";
+                break;
+            case "nrjde":
+                $url = "http://95.81.155.20/8032/nrj_145202.mp3";
+                break;
+            case "limfjorddk":
+                $url = "http://media.limfjordnetradio.dk/limfjord128";
+                break;
+            case "alfadk":
+                $url = "http://netradio.radioalfa.dk/";
+                break;
+            case "partyzonedk":
+                $url = "http://stream1.partyzone.nu/mp3";
+                break;
             default:
-                $message->reply("You can listen to the following radios: EVERadio, NoiseFM, RadioBeats, VIVAFM, Dance, ANRDK, TheVoiceDK, EuroDance, DJDeanT, AmsterdamTranceRadio, PsyRadio, Classical, ClassicRock, GrooveSalad, DroneZone, IndiePopRocks, SpaceStationSoma, SecretAgent, Lush, Underground80s, DeepSpaceOne, LeftCoast70s, BootLiquor, TheTrip, SuburbsOfGoa, BagelRadio, BeatBlender, DefConRadio, SonicUniverse, FolkForward, PopTron, IllinoisStreetLounge, Fluid, ThistleRadio, SevenInchSoul, Digitalis, CliqhopIDM, MissionControl, DubStepBeyond, Covers, TheSilentChannel, BlackRockFM, Doomed, SF1033, Earwaves, MetalDetector and Schlager..");
+                $message->reply("You can listen to the following radios: EVERadio, 90erneDK, NovaDK, NRJCA, NRJSE, NRJNO, NRJDE, LimfjordDK, AlfaDK, PartyZoneDK, NoiseFM, RadioBeats, VIVAFM, Dance, ANRDK, TheVoiceDK, EuroDance, DJDeanT, AmsterdamTranceRadio, PsyRadio, Classical, ClassicRock, GrooveSalad, DroneZone, IndiePopRocks, SpaceStationSoma, SecretAgent, Lush, Underground80s, DeepSpaceOne, LeftCoast70s, BootLiquor, TheTrip, SuburbsOfGoa, BagelRadio, BeatBlender, DefConRadio, SonicUniverse, FolkForward, PopTron, IllinoisStreetLounge, Fluid, ThistleRadio, SevenInchSoul, Digitalis, CliqhopIDM, MissionControl, DubStepBeyond, Covers, TheSilentChannel, BlackRockFM, Doomed, SF1033, Earwaves, MetalDetector and Schlager..");
                 return;
                 break;
         }
