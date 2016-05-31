@@ -18,7 +18,7 @@
     "php": "^7.0.0",
     "team-reflex/discord-php": "dev-develop",
     "predis/predis": "1.0.*",
-    "monolog/monolog": "1.9.*",
+    "monolog/monolog": "1.19.*",
     "pimple/pimple": "3.0.*",
     "norkunas/youtube-dl-php": "0.2.*"
   }
