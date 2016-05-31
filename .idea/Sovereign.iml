@@ -40,6 +40,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/react/socket-client" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/react/stream" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/asset" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/cache" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/class-loader" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/config" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/debug" />
@@ -118,6 +119,7 @@
           <root url="file://$MODULE_DIR$/vendor/react/socket-client" />
           <root url="file://$MODULE_DIR$/vendor/react/stream" />
           <root url="file://$MODULE_DIR$/vendor/symfony/asset" />
+          <root url="file://$MODULE_DIR$/vendor/symfony/cache" />
           <root url="file://$MODULE_DIR$/vendor/symfony/class-loader" />
           <root url="file://$MODULE_DIR$/vendor/symfony/config" />
           <root url="file://$MODULE_DIR$/vendor/symfony/debug" />
@@ -180,6 +182,7 @@
           <root url="file://$MODULE_DIR$/vendor/react/socket-client" />
           <root url="file://$MODULE_DIR$/vendor/react/stream" />
           <root url="file://$MODULE_DIR$/vendor/symfony/asset" />
+          <root url="file://$MODULE_DIR$/vendor/symfony/cache" />
           <root url="file://$MODULE_DIR$/vendor/symfony/class-loader" />
           <root url="file://$MODULE_DIR$/vendor/symfony/config" />
           <root url="file://$MODULE_DIR$/vendor/symfony/debug" />
