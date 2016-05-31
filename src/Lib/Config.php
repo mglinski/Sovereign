@@ -1,8 +1,15 @@
 <?php
 namespace Sovereign\Lib;
 
+/**
+ * Class Config
+ * @package Sovereign\Lib
+ */
 class Config
 {
+    /**
+     * Config constructor.
+     */
     public function __construct()
     {
     }
@@ -25,6 +32,10 @@ class Config
         return $default;
     }
 
+    /**
+     * @param null $type
+     * @return array
+     */
     public function getAll($type = null)
     {
         $config = array();

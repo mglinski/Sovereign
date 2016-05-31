@@ -3,10 +3,21 @@
 namespace Sovereign\Lib;
 
 
+/**
+ * Class Users
+ * @package Sovereign\Lib
+ */
 class Users
 {
+    /**
+     * @var Db
+     */
     protected $db;
 
+    /**
+     * Users constructor.
+     * @param Db $db
+     */
     public function __construct(Db $db)
     {
         $this->db = $db;
@@ -46,6 +57,10 @@ class Users
         }
     }
 
+    /**
+     * @param $userID
+     * @return array
+     */
     public function get($userID)
     {
         return $this->db->queryRow("SELECT * FROM users WHERE userID = :userID", array(":userID" => $userID));

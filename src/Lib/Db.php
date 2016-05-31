@@ -1,14 +1,33 @@
 <?php
 namespace Sovereign\Lib;
 
+use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
+/**
+ * Class Db
+ * @package Sovereign\Lib
+ */
 class Db
 {
+    /**
+     * @var Config
+     */
     protected $config;
+    /**
+     * @var Logger
+     */
     protected $log;
+    /**
+     * @var \PDO
+     */
     private $pdo;
 
+    /**
+     * Db constructor.
+     * @param Config $config
+     * @param Logger $log
+     */
     public function __construct(Config $config, Logger $log)
     {
         $this->log = $log;
@@ -16,19 +35,30 @@ class Db
         $this->pdo = $this->connect();
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         return array();
     }
 
+    /**
+     * This is for the pthreads compatibility - for some reason the DB just goes tits up when using pthreads
+     * and PDO.. Hence the __wakeup() call, that restarts the database.
+     * No numbers on it, but it more than likely adds quite a bit of latency.
+     */
     public function __wakeup()
     {
-        $this->log = new \Monolog\Logger("Sovereign");
-        $this->log->pushHandler(new \Monolog\Handler\StreamHandler("php://stdout", \Monolog\Logger::INFO));
+        $this->log = new Logger("Sovereign");
+        $this->log->pushHandler(new StreamHandler("php://stdout", Logger::INFO));
         $this->config = new Config();
         $this->pdo = $this->connect();
     }
 
+    /**
+     * @return \PDO
+     */
     private function connect()
     {
         $dsn = "mysql:dbname={$this->config->get("dbName", "db")};host={$this->config->get("dbHost", "db")}";
@@ -48,17 +78,27 @@ class Db
         return $pdo;
     }
 
+    /**
+     * @param String $query
+     * @param array $parameters
+     * @return array
+     */
     public function queryRow(String $query, $parameters = array())
     {
         $result = $this->query($query, $parameters);
 
         if (count($result) >= 1) {
             return $result[0];
-        }
 
+    }
         return array();
     }
 
+    /**
+     * @param String $query
+     * @param array $parameters
+     * @return array
+     */
     public function query(String $query, $parameters = array())
     {
         try {
@@ -87,6 +127,9 @@ class Db
     }
 
     /**
+     * @param String $query
+     * @param String $field
+     * @param array $parameters
      * @return string
      */
     public function queryField(String $query, String $field, $parameters = array())
@@ -101,6 +144,11 @@ class Db
         return $resultRow[$field];
     }
 
+    /**
+     * @param String $query
+     * @param array $parameters
+     * @return int|null|string
+     */
     public function execute(String $query, $parameters = array())
     {
         try {
