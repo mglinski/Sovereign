@@ -4,6 +4,7 @@
 
 # Sovereign
 Sovereign is a bot for Discord, that is not really ment for self-hosting.
+
 To invite it to your server use the following link: https://discordapp.com/oauth2/authorize?client_id=176115483513323520&scope=bot&permissions=36703232
 
 # Warning
@@ -11,8 +12,9 @@ This bot will NOT work for you, unless you have PHP7 compiled with ZTS (Zend Thr
 
 # Requirements
 PHP7 (with ZTS)
+
 PThreads
-Redis
+
 MySQL/MariaDB
 
 # Installation instructions
