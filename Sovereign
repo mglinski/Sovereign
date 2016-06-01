@@ -8,6 +8,7 @@ error_reporting(1);
 error_reporting(E_ALL);
 define('DISCORDPHP_STARTTIME', microtime(true));
 define('BASEDIR', __DIR__);
+define('SOVEREIGN_CONFIG_FILE', BASEDIR . '/config/config.php');
 
 // Load the autoloader
 require_once(BASEDIR . '/vendor/autoload.php');
@@ -15,6 +16,8 @@ require_once(BASEDIR . '/vendor/autoload.php');
 // Init the container object
 $container = getContainer();
 
+// Load the bot into the service container
+$container->share('app', \Sovereign\Sovereign::class)->withArgument($container);
 
 try {
     // Init the bot
