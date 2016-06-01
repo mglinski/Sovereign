@@ -117,9 +117,8 @@ class Sovereign
         $this->extras['startTime'] = time();
         $this->extras['memberCount'] = 0;
         $this->extras['guildCount'] = 0;
-        $this->pool = new \Pool(24, \Worker::class);
-        $this->timers = new \Pool(4, \Worker::class);
-        $this->voice = new \Pool(24, \Worker::class);
+        $this->pool = new \Pool(count($this->onMessage), \Worker::class);
+        $this->timers = new \Pool(count($this->onTimer), \Worker::class);
 
         // Init Discord and Websocket
         $this->log->addInfo('Initializing Discord and Websocket connections..');
@@ -169,8 +168,8 @@ class Sovereign
             $this->timers->shutdown();
 
             // Startup the pool again
-            $this->pool = new \Pool(24, \Worker::class);
-            $this->timers = new \Pool(4, \Worker::class);
+            $this->pool = new \Pool(count($this->onMessage), \Worker::class);
+            $this->timers = new \Pool(count($this->onTimer), \Worker::class);
         });
 
         // Handle the onReady event, and setup some timers and so forth
