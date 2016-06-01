@@ -218,7 +218,7 @@ class Sovereign
                     $this->extras['onVoicePlugins'] = $this->onVoice;
                 }
 
-                $this->log->addInfo('Currently running audio streams: ' . count($this->onVoice));
+                $this->log->addInfo('Currently running audio streams: ' . count($this->audioStreams));
                 $this->log->addInfo("Member recount, currently available to: {$this->extras['memberCount']} people");
             });
 
