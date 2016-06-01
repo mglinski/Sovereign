@@ -234,6 +234,7 @@ class Sovereign
 
         $this->websocket->on('close', function ($opCode, $reason) {
             $this->log->addWarning('Websocket got closed', ['code' => $opCode, 'reason' => $reason]);
+            die(1);
         });
 
         $this->websocket->on('reconnecting', function () {
@@ -380,26 +381,36 @@ class Sovereign
 
         // Create a new cleverbot \nick\ for this new guild
         $this->websocket->on(Event::GUILD_CREATE, function (Guild $guild) {
-            $this->log->addInfo("Setting up Cleverbot for {$guild->name}");
-            $serverID = $guild->id;
-            $result = $this->curl->post('https://cleverbot.io/1.0/create', ['user' => $this->globalConfig->get('user', 'cleverbot'), 'key' => $this->globalConfig->get('key', 'cleverbot')]);
+            $cleverBotExists = $this->db->queryField("SELECT serverID FROM cleverbot WHERE serverID = :serverID", "serverID", array(":serverID" => $guild->id));
+            $guildExists = $this->db->queryField("SELECT guildID FROM guilds WHERE guildID = :serverID", "guildID", array(":serverID" => $guild->id));
 
-            if ($result) {
-                $result = @json_decode($result);
-                $nick = $result->nick ?? false;
+            // Only create a new server nick if the cleverbot instance doesn't exist.. (Hopefully cleverbot.io is done deleting them at random)
+            if(!isset($cleverBotExists)) {
+                $this->log->addInfo("Setting up Cleverbot for {$guild->name}");
+                $serverID = $guild->id;
+                $result = $this->curl->post('https://cleverbot.io/1.0/create', ['user' => $this->globalConfig->get('user', 'cleverbot'), 'key' => $this->globalConfig->get('key', 'cleverbot')]);
 
-                if ($nick) {
-                    $this->db->execute('INSERT INTO cleverbot (serverID, nick) VALUES (:serverID, :nick) ON DUPLICATE KEY UPDATE nick = :nick', [':serverID' => $serverID, ':nick' => $nick]);
+                if ($result) {
+                    $result = @json_decode($result);
+                    $nick = $result->nick ?? false;
+
+                    if ($nick) {
+                        $this->db->execute('INSERT INTO cleverbot (serverID, nick) VALUES (:serverID, :nick) ON DUPLICATE KEY UPDATE nick = :nick', [':serverID' => $serverID, ':nick' => $nick]);
+                    }
                 }
             }
 
-            // Send a hello message to the channel (Only if it's new!)
-            //$message = "Hello, i was invited here by someone with admin permissions, i have quite a few features that you can discover by doing %help\n";
-            //$message .= "I am sorry if i am triggering other bots aswell, you can change my trigger with %config setTrigger newTrigger (Example: %config setTrigger *)\n";
-            //$message .= "If you for some reason don't want me here after all, just kick me ;)";
-            // Get the first channel in the list (usually the default channel)
-            //$channel = $guild->channels->first();
-            //$channel->sendMessage($message);
+            if(!isset($guildExists)) {
+                $this->db->execute("INSERT IGNORE INTO guilds (guildID) VALUES (:guildID)", array(":guildID" => $guild->id));
+
+                // Send a hello message to the channel (Only if it's new!)
+                //$message = "Hello, i was invited here by someone with admin permissions, i have quite a few features that you can discover by doing %help\n";
+                //$message .= "I am sorry if i am triggering other bots aswell, you can change my trigger with %config setTrigger newTrigger (Example: %config setTrigger *)\n";
+                //$message .= "If you for some reason don't want me here after all, just kick me ;)";
+                // Get the first channel in the list (usually the default channel)
+                //$channel = $guild->channels->first();
+                //$channel->sendMessage($message);
+            }
         });
 
         // Run the websocket, and in turn, the bot!
