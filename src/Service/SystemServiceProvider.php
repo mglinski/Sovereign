@@ -38,7 +38,7 @@ class SystemServiceProvider extends AbstractServiceProvider
         $container->get('log')->pushHandler(new \Monolog\Handler\StreamHandler('php://stdout', \Monolog\Logger::INFO));
 
         $container->share('db', 'Sovereign\Lib\Db')->withArgument('config')->withArgument('log');
-        $container->share('config', 'Sovereign\Lib\Config');
+        $container->share('config', 'Sovereign\Lib\Config')->withArgument('configFile')->withArgument('log');
         $container->share('curl', 'Sovereign\Lib\cURL')->withArgument('log');
         $container->share('settings', 'Sovereign\Lib\Settings')->withArgument('db');
         $container->share('permissions', 'Sovereign\Lib\Permissions')->withArgument('db')->withArgument('config');
