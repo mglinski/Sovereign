@@ -2,7 +2,6 @@
 namespace Sovereign\Lib;
 
 use League\Container\Container;
-use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
 /**
