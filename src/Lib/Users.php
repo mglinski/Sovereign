@@ -7,6 +7,10 @@ namespace Sovereign\Lib;
  * Class Users
  * @package Sovereign\Lib
  */
+/**
+ * Class Users
+ * @package Sovereign\Lib
+ */
 class Users
 {
     /**
@@ -24,10 +28,14 @@ class Users
     }
 
     /**
-     * @param string $lastStatus
-     * @param string $lastSeen
-     * @param string|null $lastSpoke
-     * @param string|null $lastWritten
+     * @param $userID
+     * @param $name
+     * @param $lastStatus
+     * @param $game
+     * @param $lastSeen
+     * @param $lastSpoke
+     * @param $lastWritten
+     * @throws \Exception
      */
     public function set($userID, $name, $lastStatus, $game, $lastSeen, $lastSpoke, $lastWritten)
     {
