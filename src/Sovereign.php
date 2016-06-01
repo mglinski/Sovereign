@@ -205,7 +205,7 @@ class Sovereign
                 });
             }
 
-            // Issue periodically member recount
+            // Issue periodically recounting and other things (Needed because of pthreads not putting the entire context into children - leading to some weirdness in some plugins)
             $this->websocket->loop->addPeriodicTimer(600, function () {
                 $this->extras['memberCount'] = 0;
                 $this->extras['guildCount'] = 0;
@@ -218,6 +218,7 @@ class Sovereign
                     $this->extras['onVoicePlugins'] = $this->onVoice;
                 }
 
+                // Output periodic information while doing the recounting stuff
                 $this->log->addInfo('Currently running audio streams: ' . count($this->audioStreams));
                 $this->log->addInfo("Member recount, currently available to: {$this->extras['memberCount']} people");
             });
