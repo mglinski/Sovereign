@@ -39,8 +39,8 @@ class Config
         }
 
         try {
-            $this->config = array_change_key_case(include(realpath($configFile)), \CASE_LOWER);
-            $this->logger->addInfo('Config file loaded: '.realpath($configFile));
+            $this->config = array_change_key_case(include($configFile), \CASE_LOWER);
+            $this->logger->addDebug('Config file loaded: '.realpath($configFile));
         } catch (\Exception $e) {
             $this->logger->addError('Failed loading config file ('.realpath($configFile).'): '.$e->getMessage());
         }
@@ -59,7 +59,7 @@ class Config
             return $this->config[$type][$key];
         }
 
-        $this->logger->addInfo('Config setting not found: ['.$type.']['.$key.']');
+        $this->logger->addWarning('Config setting not found: ['.$type.']['.$key.']');
 
         return $default;
     }
@@ -75,7 +75,7 @@ class Config
             return $this->config[$type];
         }
 
-        $this->logger->addInfo('Config group not found: ['.$type.']');
+        $this->logger->addWarning('Config group not found: ['.$type.']');
 
         return array();
     }

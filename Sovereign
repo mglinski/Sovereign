@@ -10,10 +10,19 @@ define('DISCORDPHP_STARTTIME', microtime(true));
 define('BASEDIR', __DIR__);
 
 // Load the autoloader
-require_once(__DIR__ . '/vendor/autoload.php');
+require_once(BASEDIR . '/vendor/autoload.php');
 
-// Init the container
+// Init the container object
 $container = getContainer();
+
+// register default config file
+$container->add('configFile', BASEDIR . '/config/config.php');
+
+// Add the default system service provider
+$container->addServiceProvider(\Sovereign\Service\SystemServiceProvider::class);
+
+// Load the bot into the service container
+$container->share('app', \Sovereign\Sovereign::class)->withArgument($container);
 
 try {
     // Init the bot
@@ -29,27 +38,3 @@ try {
 
 // Launch the bot
 $bot->run();
-
-// Initialize the container
-function getContainer() {
-    static $container;
-    if(!isset($container)) {
-        $container = new League\Container\Container;
-
-        //. Autowire Constructor Deps
-        $container->delegate(
-            new League\Container\ReflectionContainer
-        );
-
-        // register default config file
-        $container->add('configFile', BASEDIR . '/config/config.php');
-
-        // Add the default system service provider
-        $container->addServiceProvider(\Sovereign\Service\SystemServiceProvider::class);
-
-        // Load the bot into the service container
-        $container->share('app', \Sovereign\Sovereign::class)->withArgument($container);
-    }
-
-    return $container;
-}
