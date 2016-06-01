@@ -13,21 +13,7 @@ define('BASEDIR', __DIR__);
 require_once(__DIR__ . '/vendor/autoload.php');
 
 // Init the container
-$container = new League\Container\Container;
-
-//. Autowire Constructor Deps
-$container->delegate(
-    new League\Container\ReflectionContainer
-);
-
-// register default config file
-$container->add('configFile', BASEDIR . '/config/config.php');
-
-// Add the default system service provider
-$container->addServiceProvider(\Sovereign\Service\SystemServiceProvider::class);
-
-// Load the bot into the service container
-$container->share('app', \Sovereign\Sovereign::class)->withArgument($container);
+$container = getContainer();
 
 try {
     // Init the bot
@@ -43,3 +29,27 @@ try {
 
 // Launch the bot
 $bot->run();
+
+// Initialize the container
+function getContainer() {
+    static $container;
+    if(!isset($container)) {
+        $container = new League\Container\Container;
+
+        //. Autowire Constructor Deps
+        $container->delegate(
+            new League\Container\ReflectionContainer
+        );
+
+        // register default config file
+        $container->add('configFile', BASEDIR . '/config/config.php');
+
+        // Add the default system service provider
+        $container->addServiceProvider(\Sovereign\Service\SystemServiceProvider::class);
+
+        // Load the bot into the service container
+        $container->share('app', \Sovereign\Sovereign::class)->withArgument($container);
+    }
+
+    return $container;
+}

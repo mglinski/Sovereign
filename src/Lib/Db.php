@@ -59,6 +59,7 @@ class Db
      */
     public function __wakeup()
     {
+        $this->container = getContainer();
         $this->log = $this->container->get('log');
         $this->config = $this->container->get('config');
         $this->pdo = $this->connect();
