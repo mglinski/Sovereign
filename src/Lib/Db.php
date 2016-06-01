@@ -24,10 +24,6 @@ class Db
      * @var \PDO
      */
     private $pdo;
-    /**
-     * @var Container
-     */
-    private $container;
 
     /**
      * Db constructor.
@@ -35,12 +31,11 @@ class Db
      * @param Logger $log
      * @param Container $container
      */
-    public function __construct(Config $config, Logger $log, Container $container)
+    public function __construct(Config $config, Logger $log)
     {
         $this->log = $log;
         $this->config = $config;
         $this->pdo = $this->connect();
-        $this->container = $container;
     }
 
     /**
@@ -60,9 +55,9 @@ class Db
      */
     public function __wakeup()
     {
-        $this->container = ContainerSingleton::getInstance()->getContainerInstance();
-        $this->log = $this->container->get('log');
-        $this->config = $this->container->get('config');
+        $container = ContainerSingleton::getInstance()->getContainerInstance();
+        $this->log = $container->get('log');
+        $this->config = $container->get('config');
         $this->pdo = $this->connect();
     }
 

@@ -13,7 +13,6 @@ define('CONFIG_FILE', BASEDIR . '/config/config.php');
 // Load the autoloader
 require_once(BASEDIR . '/vendor/autoload.php');
 
-
 // Init the container object
 $container = \Sovereign\Lib\ContainerSingleton::getInstance()->getContainerInstance();
 
