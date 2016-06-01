@@ -1,4 +1,5 @@
-<?php namespace Sovereign\Service;
+<?php
+namespace Sovereign\Service;
 
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
