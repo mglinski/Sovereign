@@ -105,7 +105,7 @@ class porn extends \Threaded implements \Collectable
                 "palegirls" => "https://api.imgur.com/3/gallery/r/palegirls/time/all/",
                 "gif" => "https://api.imgur.com/3/gallery/r/NSFW_GIF/time/all/",
                 "lesbians" => "https://api.imgur.com/3/gallery/r/lesbians/time/all/",
-                "tattiis" => "https://api.imgur.com/3/gallery/r/Hotchickswithtattoos/time/all/",
+                "tattoos" => "https://api.imgur.com/3/gallery/r/Hotchickswithtattoos/time/all/",
                 "mgw" => "https://api.imgur.com/3/gallery/r/MilitaryGoneWild/time/all/",
                 "amateur" => "https://api.imgur.com/3/gallery/r/AmateurArchives/time/all/",
                 "college" => "https://api.imgur.com/3/gallery/r/collegesluts/time/all/",
@@ -119,6 +119,7 @@ class porn extends \Threaded implements \Collectable
                 "gifrecipes" => "https://api.imgur.com/3/gallery/r/gifrecipes/time/all/",
                 "bbw" => "https://api.imgur.com/3/gallery/r/bbw/time/all/",
                 "dongs" => "https://api.imgur.com/3/gallery/r/penis/time/all/",
+                "innie" => "https://api.imgur.com/3/gallery/r/innie/time/all/",
             );
 
             foreach($categories as $catName => $catURL) {
