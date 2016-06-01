@@ -37,7 +37,6 @@ class Config
             $this->logger->addError('Config file '.realpath($configFile).' not found.');
             return;
         }
-
         try {
             $this->config = array_change_key_case(include($configFile), \CASE_LOWER);
             $this->logger->addDebug('Config file loaded: '.realpath($configFile));

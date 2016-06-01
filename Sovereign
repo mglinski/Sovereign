@@ -8,18 +8,14 @@ error_reporting(1);
 error_reporting(E_ALL);
 define('DISCORDPHP_STARTTIME', microtime(true));
 define('BASEDIR', __DIR__);
+define('CONFIG_FILE', BASEDIR . '/config/config.php');
 
 // Load the autoloader
 require_once(BASEDIR . '/vendor/autoload.php');
 
+
 // Init the container object
-$container = getContainer();
-
-// register default config file
-$container->add('configFile', BASEDIR . '/config/config.php');
-
-// Add the default system service provider
-$container->addServiceProvider(\Sovereign\Service\SystemServiceProvider::class);
+$container = \Sovereign\Lib\ContainerSingleton::getInstance()->getContainerInstance();
 
 // Load the bot into the service container
 $container->share('app', \Sovereign\Sovereign::class)->withArgument($container);

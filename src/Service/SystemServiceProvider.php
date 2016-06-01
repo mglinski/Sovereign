@@ -2,6 +2,8 @@
 namespace Sovereign\Service;
 
 use League\Container\ServiceProvider\AbstractServiceProvider;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 
 class SystemServiceProvider extends AbstractServiceProvider
 {
@@ -30,13 +32,18 @@ class SystemServiceProvider extends AbstractServiceProvider
      * access the container and register or retrieve anything
      * that you need to, but remember, every alias registered
      * within this method must be declared in the `$provides` array.
+     *
+     * @throws \Exception
+     * @throws \Interop\Container\Exception\ContainerException
+     * @throws \InvalidArgumentException
+     * @throws \Interop\Container\Exception\NotFoundException
      */
     public function register()
     {
         $container = $this->getContainer();
 
         $container->share('log', 'Monolog\Logger')->withArgument('Sovereign');
-        $container->get('log')->pushHandler(new \Monolog\Handler\StreamHandler('php://stdout', \Monolog\Logger::INFO));
+        $container->get('log')->pushHandler(new StreamHandler('php://stdout', Logger::INFO));
 
         $container->share('db', 'Sovereign\Lib\Db')->withArgument('config')->withArgument('log')->withArgument($container);
         $container->share('config', 'Sovereign\Lib\Config')->withArgument('configFile')->withArgument('log');

@@ -83,6 +83,7 @@ class pc extends \Threaded implements \Collectable
 
     public function run()
     {
+        $this->log->addInfo('thing ran', []);
         $explode = explode(" ", $this->message->content);
         $prefix = $this->channelConfig->prefix;
         $system = isset($explode[0]) ? $explode[0] == "{$prefix}pc" ? "global" : str_replace($prefix, "", $explode[0]) : "global";

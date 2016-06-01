@@ -12,10 +12,7 @@
   "autoload": {
     "psr-4": {
       "Sovereign\\": "src/"
-    },
-    "files": [
-      "src/Helper/Container.php"
-    ]
+    }
   },
   "require": {
     "php": "^7.0.0",

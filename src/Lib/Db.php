@@ -1,6 +1,7 @@
 <?php
 namespace Sovereign\Lib;
 
+use Sovereign\Lib\ContainerSingleton;
 use League\Container\Container;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -59,7 +60,7 @@ class Db
      */
     public function __wakeup()
     {
-        $this->container = getContainer();
+        $this->container = ContainerSingleton::getInstance()->getContainerInstance();
         $this->log = $this->container->get('log');
         $this->config = $this->container->get('config');
         $this->pdo = $this->connect();
