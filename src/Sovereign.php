@@ -419,7 +419,7 @@ class Sovereign
     /**
      * Get the configuration/settings container and return it upstream to the calling code.
      *
-     * @return GlobalConfig
+     * @return globalConfig
      */
     public function getGlobalConfig() {
         return $this->globalConfig;
