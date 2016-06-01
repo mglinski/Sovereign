@@ -185,7 +185,7 @@ class Sovereign
             /** @var Guild $guild */
             foreach ($this->discord->getClient()->getGuildsAttribute()->all() as $guild) {
                 $this->extras['memberCount'] += $guild->member_count;
-                ++$this->extras['guildCount'];
+                $this->extras['guildCount']++;
                 $this->extras['guild']['memberCount']["id{$guild->id}"] = $guild->member_count;
                 $this->extras['onMessagePlugins'] = $this->onMessage;
                 $this->extras['onVoicePlugins'] = $this->onVoice;
