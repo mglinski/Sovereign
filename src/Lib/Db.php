@@ -1,6 +1,7 @@
 <?php
 namespace Sovereign\Lib;
 
+use League\Container\Container;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
@@ -22,17 +23,23 @@ class Db
      * @var \PDO
      */
     private $pdo;
+    /**
+     * @var Container
+     */
+    private $container;
 
     /**
      * Db constructor.
      * @param Config $config
      * @param Logger $log
+     * @param Container $container
      */
-    public function __construct(Config $config, Logger $log)
+    public function __construct(Config $config, Logger $log, Container $container)
     {
         $this->log = $log;
         $this->config = $config;
         $this->pdo = $this->connect();
+        $this->container = $container;
     }
 
     /**
@@ -52,9 +59,8 @@ class Db
      */
     public function __wakeup()
     {
-        $this->log = new Logger("Sovereign");
-        $this->log->pushHandler(new StreamHandler("php://stdout", Logger::INFO));
-        $this->config = new Config();
+        $this->log = $this->container->get('log');
+        $this->config = $this->container->get('config');
         $this->pdo = $this->connect();
     }
 
